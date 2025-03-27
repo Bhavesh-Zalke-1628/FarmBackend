@@ -31,19 +31,19 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const register = asyncHandler(async (req, res) => {
 
-    const { userName, fullName, password, email, address, mobileNumber, role } = req.body;
-    console.log(fullName, password, role)
+    const { fullName, password, mobileNumber } = req.body;
+    console.log(fullName, password)
 
-    if ([fullName, password, role].some((field) => field?.trim() === "")) {
+    if ([fullName, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
 
-    if (role == "store" && email == "") {
-        throw new ApiError(400, "Email are required");
-    }
+    // if (role == "store" && email == "") {
+    //     throw new ApiError(400, "Email are required");
+    // }
 
     const existedUser = await User.findOne({
-        $or: [{ userName }, { mobileNumber }]
+        mobileNumber
     });
 
     if (existedUser) {
@@ -51,13 +51,9 @@ const register = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({
-        userName,
-        email,
         password,
         mobileNumber,
         fullName,
-        address,
-        role
     });
 
     const createdUser = await User.findById(user._id).select('-password');
@@ -95,7 +91,7 @@ const loginUser = asyncHandler(async (req, res) => {
     console.log("password:", password);
 
     const user = await User.findOne({
-        $or: [{ userName }, { mobileNumber }]
+        mobileNumber
     }).select("+password");
 
 

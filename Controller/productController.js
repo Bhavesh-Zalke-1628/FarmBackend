@@ -21,8 +21,8 @@ const getAllProduct = asyncHandler(async (req, res) => {
 // Get product by ID
 const getProductById = asyncHandler(async (req, res) => {
     try {
-        const { id } = req.params;
-        const product = await Product.findById(id);
+        const { productId } = req.params;
+        const product = await Product.findById(productId).populate("store");
         if (!product) {
             throw new ApiError(400, "Product not found");
         }
@@ -36,20 +36,26 @@ const getProductById = asyncHandler(async (req, res) => {
 // Create a new product & add to store's products array
 const createProduct = asyncHandler(async (req, res) => {
     try {
-        const { name, company, quantity, storeId } = req.body;
+        const { name, company, quantity } = req.body;
+        const { storeId } = req.params
 
-        if (!name || !company || !storeId) {
+        if (!name || !company) {
             throw new ApiError(400, "Name, company, and storeId are required");
         }
-
-        // Create product
-        const product = await Product.create({ name, company, quantity });
 
         // Find store and update products array
         const store = await Store.findById(storeId);
         if (!store) {
             throw new ApiError(400, "Store not found");
         }
+
+        // Create product
+        const product = await Product.create({
+            name,
+            company,
+            quantity,
+            store: storeId
+        });
 
         store.products.push(product._id);
         await store.save();
@@ -63,33 +69,35 @@ const createProduct = asyncHandler(async (req, res) => {
 // Update product and store reference if storeId is changed
 const updateProduct = asyncHandler(async (req, res) => {
     try {
-        const { id } = req.params;
-        const { name, company, quantity, storeId } = req.body;
+        const { productId } = req.params;
+        const { name, company, quantity, } = req.body;
 
-        const existingProduct = await Product.findById(id);
+        console.log(productId)
+
+        const existingProduct = await Product.findById(productId);
         if (!existingProduct) {
             throw new ApiError(400, "Product not found");
         }
 
         // If storeId is changed, update store reference
-        if (storeId && storeId !== existingProduct.store?.toString()) {
-            const oldStore = await Store.findOne({ products: id });
-            if (oldStore) {
-                oldStore.products = oldStore.products.filter(prodId => prodId.toString() !== id);
-                await oldStore.save();
-            }
+        // if (storeId && storeId !== existingProduct.store?.toString()) {
+        //     const oldStore = await Store.findOne({ products: productId });
+        //     if (oldStore) {
+        //         oldStore.products = oldStore.products.filter(prodId => prodId.toString() !== id);
+        //         await oldStore.save();
+        //     }
 
-            const newStore = await Store.findById(storeId);
-            if (!newStore) {
-                throw new ApiError(400, "New store not found");
-            }
-            newStore.products.push(id);
-            await newStore.save();
-        }
+        //     const newStore = await Store.findById(storeId);
+        //     if (!newStore) {
+        //         throw new ApiError(400, "New store not found");
+        //     }
+        //     newStore.products.push(id);
+        //     await newStore.save();
+        // }
 
         // Update product
         const updatedProduct = await Product.findByIdAndUpdate(
-            id,
+            productId,
             { name, company, quantity },
             { new: true }
         );
@@ -103,24 +111,27 @@ const updateProduct = asyncHandler(async (req, res) => {
 // Delete product & remove from store's products array
 const deleteProduct = asyncHandler(async (req, res) => {
     try {
-        const { id } = req.params;
+        const { productId } = req.params;
 
-        const product = await Product.findById(id);
+        const product = await Product.findById(productId);
         if (!product) {
             throw new ApiError(400, "Product not found");
         }
 
+        console.log(product)
+
         // Remove from store's products array
-        const store = await Store.findOne({ products: id });
+        const store = await Store.findOne({ products: productId });
         if (store) {
-            store.products = store.products.filter(prodId => prodId.toString() !== id);
+            store.products = store.products.filter(prodId => prodId.toString() !== productId);
             await store.save();
         }
 
         // Delete product
-        await Product.findByIdAndDelete(id);
+        await Product.findByIdAndDelete(productId);
 
         return res.status(200).json(new ApiResponse(200, null, "Product deleted successfully"));
+
     } catch (error) {
         throw new ApiError(400, error.message || "Failed to delete product");
     }

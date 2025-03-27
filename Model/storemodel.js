@@ -10,12 +10,12 @@ const storeSchema = new Schema({
         required: true,
     },
     contact: {
-        type: String,
+        type: Number,
         required: true,
     },
     owner: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
     address: {
         type: String,

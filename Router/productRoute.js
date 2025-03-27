@@ -4,12 +4,13 @@ import { createProduct, deleteProduct, getAllProduct, getProductById, updateProd
 
 const router = Router();
 
-router.route('/create-product').post(isLoggedIn, createProduct);
-router.route('/get-product/:id').get(isLoggedIn, getProductById);
+router.route('/create-product/:storeId').post(isLoggedIn, createProduct);
+router.route('/get-product/:productId').get(isLoggedIn, getProductById);
 router.route('/get-all-product').get(isLoggedIn, getAllProduct);
-router.route('/update-product/:id').put(isLoggedIn, authorisedRoles("store"), updateProduct);
-router.route('/delete-product/:id').delete(isLoggedIn, verifyJwt, authorisedRoles('store', 'admin'), deleteProduct);
+router.route('/update-product/:productId').put(isLoggedIn, verifyJwt, updateProduct);
+router.route('/delete-product/:productId').delete(isLoggedIn, verifyJwt, deleteProduct);
 
 
 
 export default router;
+

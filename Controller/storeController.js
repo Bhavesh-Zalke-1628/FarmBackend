@@ -34,43 +34,46 @@ const getStoreById = asyncHandler(async (req, res) => {
     }
 })
 
-const createStore = asyncHandler(async (req, res) => {
+const createStore = asyncHandler(async (req, res, next) => {
     try {
-        const { name, email, contact, address, owner } = req.body;
-        console.log(req.user.id)
-        if ([name, email, contact, address, owner].some((field) => field?.trim() === "")) {
-            throw new ApiError(400, "All fields are required");
+        const { name, email, contact, address } = req.body;
+
+        if (!req.user?.id) {
+            return next(new ApiError(401, "Unauthorized: User not found"));
         }
 
+        console.log(req.user)
+
+        if ([name, email, address].some((field) => field?.trim() === "")) {
+            return next(new ApiError(400, "All fields are required"));
+        }
 
         const store = await Store.create({
             name,
             email,
             contact,
             address,
-        })
+            owner: req.user.id // ✅ Using the authenticated user's ID
+        });
 
-        console.log(store)
-
-        const createdStore = await Store.findById(store._id);
-
-        console.log(createdStore)
+        const createdStore = await Store.findById(store._id).populate("owner");
 
         if (!createdStore) {
-            throw new ApiError(400, "Failed to create the store")
+            return next(new ApiError(400, "Failed to create the store"));
         }
 
-        return res.status(200).json(new ApiResponse(200, createdStore, "Store created successfully"));
+        return res.status(201).json(new ApiResponse(201, createdStore, "Store created successfully"));
 
     } catch (error) {
-        throw new ApiError(400, error.message || "Failed to create the store ");
+        return next(new ApiError(500, error.message || "Failed to create the store"));
     }
-})
+});
+
 
 const updateStore = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, address, contact, owner } = req.body;
+        const { name, email, address, contact } = req.body;
 
 
         const existingStore = await Store.findById(id);
@@ -85,7 +88,6 @@ const updateStore = asyncHandler(async (req, res) => {
                 email,
                 address,
                 contact,
-                owner
             },
             {
                 new: true,
@@ -118,6 +120,8 @@ const deleteStore = asyncHandler(async (req, res) => {
         if (!store) {
             throw new ApiError(400, "Store not found");
         }
+
+        console.log(store)
 
         // Delete the store
         await Store.findByIdAndDelete(id);

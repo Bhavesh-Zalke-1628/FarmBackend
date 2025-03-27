@@ -4,16 +4,6 @@ import jwt from 'jsonwebtoken';
 
 const userSchema = new Schema(
     {
-        userName: {
-            type: String,
-            // required: [true, 'Username is required'],
-            minLength: [5, "Username must be at least 5 characters"],
-            maxLength: [20, "Username should be less than 20 characters"],
-            trim: true,
-            lowercase: true,
-            // unique: true, // Ensures usernames are unique
-            index: true
-        },
         fullName: {
             type: String,
             required: [true, 'Full name is required'],
@@ -37,8 +27,8 @@ const userSchema = new Schema(
         },
         role: {
             type: String,
-            enum: ['farmer', 'store', 'admin'], // Added "user" since it was defaulted before
-            default: "store"
+            enum: ['farmer', 'admin'], // Added "user" since it was defaulted before
+            default: "farmer"
         },
         address: {
             type: String,
