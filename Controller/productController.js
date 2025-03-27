@@ -23,6 +23,7 @@ const getProductById = asyncHandler(async (req, res) => {
     try {
         const { productId } = req.params;
         const product = await Product.findById(productId).populate("store");
+
         if (!product) {
             throw new ApiError(400, "Product not found");
         }
@@ -69,12 +70,12 @@ const createProduct = asyncHandler(async (req, res) => {
 // Update product and store reference if storeId is changed
 const updateProduct = asyncHandler(async (req, res) => {
     try {
+
         const { productId } = req.params;
         const { name, company, quantity, } = req.body;
 
-        console.log(productId)
-
         const existingProduct = await Product.findById(productId);
+
         if (!existingProduct) {
             throw new ApiError(400, "Product not found");
         }
@@ -82,6 +83,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         // If storeId is changed, update store reference
         // if (storeId && storeId !== existingProduct.store?.toString()) {
         //     const oldStore = await Store.findOne({ products: productId });
+
         //     if (oldStore) {
         //         oldStore.products = oldStore.products.filter(prodId => prodId.toString() !== id);
         //         await oldStore.save();
@@ -119,13 +121,18 @@ const deleteProduct = asyncHandler(async (req, res) => {
         }
 
         console.log(product)
+        const storeId = product.store.toString();
+        console.log(storeId)
 
         // Remove from store's products array
-        const store = await Store.findOne({ products: productId });
+        const store = await Store.findById(storeId);
+        console.log(store)
+
         if (store) {
             store.products = store.products.filter(prodId => prodId.toString() !== productId);
             await store.save();
         }
+
 
         // Delete product
         await Product.findByIdAndDelete(productId);
