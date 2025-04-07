@@ -4,32 +4,44 @@ const storeSchema = new Schema({
     name: {
         type: String,
         required: true,
+        trim: true
     },
     email: {
         type: String,
         required: true,
+        lowercase: true,
+        trim: true
     },
     contact: {
         type: Number,
-        required: true,
+        required: true
     },
     owner: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     address: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     products: [{
-        type: Schema.Types.ObjectId, // ✅ Corrected field name
-        ref: "Product" // ✅ Matches the model name exactly
+        type: Schema.Types.ObjectId,
+        ref: "Product"
     }],
     subscription: {
-        id: String,
-        status: String
+        id: {
+            type: String,
+            default: null
+        },
+        status: {
+            type: String,
+            enum: ["active", "cancelled", "inactive"],
+            default: "inactive"
+        }
     }
 }, { timestamps: true });
 
-const Store = model("Store", storeSchema); // ✅ Capitalized correctly
+const Store = model("Store", storeSchema);
 export default Store;
