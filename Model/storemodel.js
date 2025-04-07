@@ -26,11 +26,8 @@ const storeSchema = new Schema({
         ref: "Product" // ✅ Matches the model name exactly
     }],
     subscription: {
-        plan_ID: String,
-        status: {
-            type: String,
-            default: "inactive"
-        }
+        id: String,
+        status: String
     }
 }, { timestamps: true });
 

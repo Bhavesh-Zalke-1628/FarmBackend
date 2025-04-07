@@ -12,15 +12,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.22.0",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.5.1",
+    "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.1",
+    "mongoose": "^8.13.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.10.0"
+    "nodemailer": "^6.10.0",
+    "razorpay": "^2.9.6"
   }
 }

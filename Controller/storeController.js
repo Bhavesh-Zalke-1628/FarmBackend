@@ -37,6 +37,7 @@ const getStoreById = asyncHandler(async (req, res) => {
 const createStore = asyncHandler(async (req, res, next) => {
     try {
         const { name, email, contact, address } = req.body;
+        console.log(req.body)
 
         if (!req.user?.id) {
             return next(new ApiError(401, "Unauthorized: User not found"));

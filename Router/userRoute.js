@@ -7,7 +7,6 @@ import { isLoggedIn, verifyJwt } from "../Middlerware/authMiddleWare.js";
 
 router.route('/register').post(register);
 router.route('/login-user').post(loginUser);
-// router.route('/login/admin').post(loginAdmin)
 
 // secure route 
 router.route('/logout').get(verifyJwt, logOut);

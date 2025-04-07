@@ -18,13 +18,13 @@ const userSchema = new Schema(
             required: true,
             select: false // Must explicitly select when querying
         },
-        email: {
-            type: String,
-            default: "",
-            unique: true, // Prevents duplicate emails
-            lowercase: true,
-            trim: true
-        },
+        // email: {
+        //     type: String,
+        //     default: "",
+        //     // unique: true, // Prevents duplicate emails
+        //     lowercase: true,
+        //     trim: true
+        // },
         role: {
             type: String,
             enum: ['farmer', 'admin'], // Added "user" since it was defaulted before
@@ -39,10 +39,7 @@ const userSchema = new Schema(
             type: String, // Changed to String to avoid number precision issues
             unique: true // Ensures no duplicate numbers
         },
-        subscription: {
-            id: String,
-            status: String
-        },
+
         refreshToken: {
             type: String
         }

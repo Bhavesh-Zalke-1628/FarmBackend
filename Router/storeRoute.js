@@ -10,8 +10,6 @@ router.route('/get-all-store').get(isLoggedIn, getAllStore);
 router.route('/update-store/:id').put(isLoggedIn, updateStore);
 router.route('/delete-store/:id').delete(isLoggedIn, verifyJwt, deleteStore);
 
-
-
 export default router;
 
 

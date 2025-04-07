@@ -1,7 +1,24 @@
 import { app } from "./app.js";
 import { config } from "dotenv";
 import connectDB from "./DbConnection/DbConnection.js";
+import Razorpay from "razorpay";
+import { v2 as cloudinary } from 'cloudinary';
 config()
+
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
+});
+
+
+// Configure Razorpay
+const razorpay = new Razorpay({
+    key_id: process.env.RazorpayKeyId,
+    key_secret: process.env.key_secret
+});
 
 
 
@@ -14,3 +31,7 @@ connectDB()
     .catch((err) => {
         console.log("MONGO db connection failed !!! ", err);
     })
+
+export {
+    razorpay
+}
