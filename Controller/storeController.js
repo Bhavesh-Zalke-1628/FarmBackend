@@ -21,7 +21,8 @@ const getAllStore = asyncHandler(async (req, res) => {
 const getStoreById = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;
-        const store = await Store.findById(id).populate("products");
+        // const store = await Store.findById(id).populate("products");
+        const store = await Store.find({ owner: id }).populate("owner")
 
         if (!store) {
             throw new ApiError(400, "Store not found");
