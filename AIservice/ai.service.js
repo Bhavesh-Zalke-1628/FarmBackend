@@ -31,7 +31,6 @@ async function getSugarcaneWeatherForecast(location) {
 async function main() {
     const location = "pune"; // Replace with the actual location
     const forecast = await getSugarcaneWeatherForecast(location);
-    console.log("Sugarcane Weather Forecast:", forecast);
 }
 
 main();

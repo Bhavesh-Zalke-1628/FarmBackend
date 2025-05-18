@@ -5,8 +5,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
 const isLoggedIn = async (req, res, next) => {
-    console.log(req.cookies.accessToken)
-
     const { accessToken } = req.cookies;
 
 
@@ -28,11 +26,9 @@ const verifyJwt =
                     throw new ApiError(400, "Unauthenticated request")
                 }
 
-                console.log('token', token)
 
                 const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
 
-                console.log("decodedToken", decodedToken)
                 const user = await User.findById(decodedToken.id).select("-password -refreshToken")
 
                 if (!user) {
@@ -49,7 +45,6 @@ const verifyJwt =
 
 
 const authorisedRoles = (...roles) => async (req, res, next) => {
-    console.log(req.user)
     const currentUserRoles = req.user.role;
     if (!roles.includes(currentUserRoles)) {
         return next(
@@ -62,8 +57,6 @@ const authorisedRoles = (...roles) => async (req, res, next) => {
 
 const authorisedSubscriber = async (req, res, next) => {
     const user = await User.findById(req.user.id)
-    console.log('authorisedSubscriber user >', user)
-    // console.log(user.subscription.id)
     if (user.role !== 'store' && user.subscription.status !== 'active') {
         return next(
             new ApiError('Plase subscribe to access this cource ', 400)

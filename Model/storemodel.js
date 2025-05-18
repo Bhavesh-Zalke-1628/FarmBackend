@@ -40,6 +40,10 @@ const storeSchema = new Schema({
             enum: ["active", "cancelled", "inactive"],
             default: "inactive"
         }
+    },
+    store: {
+        type: Schema.Types.ObjectId,
+        ref: "Store"
     }
 }, { timestamps: true });
 

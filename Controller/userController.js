@@ -32,7 +32,6 @@ const generateAccessAndRefreshTokens = async (userId) => {
 const register = asyncHandler(async (req, res) => {
 
     const { fullName, password, mobileNumber } = req.body;
-    console.log(fullName, password)
 
     if ([fullName, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
@@ -86,16 +85,11 @@ const register = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { userName, mobileNumber, password } = req.body;
-    console.log("userName:", userName);
-    console.log("mobileNumber:", mobileNumber);
-    console.log("password:", password);
+   
 
     const user = await User.findOne({
         mobileNumber
     }).select("+password");
-
-
-    console.log("Found user:", user);
 
     if (!user) {
         throw new ApiError(400, "User does not exist");
@@ -126,8 +120,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logOut = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-
-    console.log(_id)
 
     await User.findByIdAndUpdate(_id, { $set: { refreshToken: undefined } }, { new: true });
 
@@ -188,7 +180,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-    console.log(req.user)
     return res.status(200).json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 });
 

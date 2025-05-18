@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import Store from "../Model/storemodel.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import User from "../Model/userModel.js";
 
 const getAllStore = asyncHandler(async (req, res) => {
     try {
@@ -22,7 +23,8 @@ const getStoreById = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;
         // const store = await Store.findById(id).populate("products");
-        const store = await Store.find({ owner: id }).populate("owner")
+        const store = await Store.find({ owner: id }).populate("owner products")
+
 
         if (!store) {
             throw new ApiError(400, "Store not found");
@@ -38,13 +40,13 @@ const getStoreById = asyncHandler(async (req, res) => {
 const createStore = asyncHandler(async (req, res, next) => {
     try {
         const { name, email, contact, address } = req.body;
-        console.log(req.body)
 
-        if (!req.user?.id) {
+
+        const user = await User.findById(req?.user?.id)
+
+        if (!user) {
             return next(new ApiError(401, "Unauthorized: User not found"));
         }
-
-        console.log(req.user)
 
         if ([name, email, address].some((field) => field?.trim() === "")) {
             return next(new ApiError(400, "All fields are required"));
@@ -63,6 +65,11 @@ const createStore = asyncHandler(async (req, res, next) => {
         if (!createdStore) {
             return next(new ApiError(400, "Failed to create the store"));
         }
+
+
+        user.role = 'admin';
+        // user.store = createdStore._id;
+        await user.save();
 
         return res.status(201).json(new ApiResponse(201, createdStore, "Store created successfully"));
 
@@ -122,8 +129,6 @@ const deleteStore = asyncHandler(async (req, res) => {
         if (!store) {
             throw new ApiError(400, "Store not found");
         }
-
-        console.log(store)
 
         // Delete the store
         await Store.findByIdAndDelete(id);

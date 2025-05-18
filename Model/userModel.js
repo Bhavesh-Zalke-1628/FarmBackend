@@ -18,13 +18,12 @@ const userSchema = new Schema(
             required: true,
             select: false // Must explicitly select when querying
         },
-        // email: {
-        //     type: String,
-        //     default: "",
-        //     // unique: true, // Prevents duplicate emails
-        //     lowercase: true,
-        //     trim: true
-        // },
+        email: {
+            type: String,
+            // unique: true, // Prevents duplicate emails
+            lowercase: true,
+            trim: true
+        },
         role: {
             type: String,
             enum: ['farmer', 'admin'], // Added "user" since it was defaulted before
@@ -73,9 +72,6 @@ userSchema.methods.generateRefreshToken = async function () {
 
 // Compare Password
 userSchema.methods.isPasswordCorrect = async function (password) {
-    console.log("Entered Password:", password);
-    console.log("Hashed Password in DB:", this.password);
-
     return await bcrypt.compare(password, this.password);
 };
 

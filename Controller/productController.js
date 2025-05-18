@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import Product from "../Model/productModel.js";
 import Store from "../Model/storemodel.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 // Get all products
 const getAllProduct = asyncHandler(async (req, res) => {
@@ -37,35 +38,49 @@ const getProductById = asyncHandler(async (req, res) => {
 // Create a new product & add to store's products array
 const createProduct = asyncHandler(async (req, res) => {
     try {
-        const { name, company, quantity } = req.body;
-        const { storeId } = req.params
+        console.log(req.body)
+        const { name, company, quantity, price, description } = req.body.productData;
+        const { storeId } = req.params;
 
-        if (!name || !company) {
-            throw new ApiError(400, "Name, company, and storeId are required");
+        if (!name || !company || !description || !storeId) {
+            throw new ApiError(400, "Name, company, description, and storeId are required");
         }
 
-        // Find store and update products array
         const store = await Store.findById(storeId);
         if (!store) {
             throw new ApiError(400, "Store not found");
         }
 
-        // Create product
         const product = await Product.create({
             name,
             company,
             quantity,
+            price,
+            description,
             store: storeId
         });
+
+        // if (req.file) {
+        //     const localPath = req.file.path;
+        //     const productImg = await uploadOnCloudinary(localPath);
+        //     product.img = {
+        //         public_id: productImg.public_id,
+        //         secure_url: productImg.secure_url,
+        //     };
+        //     await product.save();
+        // }
 
         store.products.push(product._id);
         await store.save();
 
-        return res.status(200).json(new ApiResponse(200, product, "Product created and added to store successfully"));
+        return res
+            .status(200)
+            .json(new ApiResponse(200, product, "Product created and added to store successfully"));
     } catch (error) {
         throw new ApiError(400, error.message || "Failed to create product");
     }
 });
+
 
 // Update product and store reference if storeId is changed
 const updateProduct = asyncHandler(async (req, res) => {
@@ -119,15 +134,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
         if (!product) {
             throw new ApiError(400, "Product not found");
         }
-
-        console.log(product)
         const storeId = product.store.toString();
-        console.log(storeId)
-
         // Remove from store's products array
         const store = await Store.findById(storeId);
-        console.log(store)
-
         if (store) {
             store.products = store.products.filter(prodId => prodId.toString() !== productId);
             await store.save();
@@ -144,10 +153,19 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 });
 
+const getProductByStoreId = asyncHandler(async () => {
+    const { storeId } = req.params
+    if (!storeId) {
+        throw new ApiError(4040, "Store id not mentaioned")
+    }
+
+})
+
 export {
     getAllProduct,
     getProductById,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getProductByStoreId
 };

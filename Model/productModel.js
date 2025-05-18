@@ -18,6 +18,14 @@ const productSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Store", // ✅ Capitalized correctly
         },
+        price: {
+            type: Number,
+            default: 0
+        },
+        description: {
+            type: String,
+            required: true
+        },
         img: {
             public_id: {
                 type: String,

@@ -18,23 +18,14 @@ const getRazorpayKey = asyncHandler(async (req, res) => {
 // Buy Subscription
 const buySubscription = asyncHandler(async (req, res) => {
     const { id } = req.user;
-
     const user = await User.findById(id);
     if (!user) throw new ApiError(400, "User not found");
-
-    console.log(user)
-
     const planId = process.env.RAZORPAY_PLAN_ID;
-    console.log(planId);
-
     const subscription = await razorpay.subscriptions.create({
         plan_id: planId,
         customer_notify: 1,
         total_count: 12
     });
-
-    console.log(subscription)
-
     res.status(200).json(
         new ApiResponse(200, { subscription_id: subscription.id }, "Subscription created")
     );
