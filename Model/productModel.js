@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { type } from "os";
 
 const productSchema = new Schema(
     {
@@ -33,6 +34,10 @@ const productSchema = new Schema(
             secure_url: {
                 type: String,
             }
+        },
+        outOfStock: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

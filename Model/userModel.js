@@ -39,6 +39,15 @@ const userSchema = new Schema(
             unique: true // Ensures no duplicate numbers
         },
 
+        farm: {
+            farmName: {
+                type: String,
+            },
+            location: {
+                type: String
+            }
+        },
+        
         refreshToken: {
             type: String
         }

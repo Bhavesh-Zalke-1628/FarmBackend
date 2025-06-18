@@ -85,7 +85,7 @@ const register = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { userName, mobileNumber, password } = req.body;
-   
+
 
     const user = await User.findOne({
         mobileNumber
@@ -184,21 +184,23 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { fullName, email } = req.body;
-
-    if (!fullName || !email) {
-        throw new ApiError(400, "All fields are required");
-    }
+    const { name, email, address, farmName, location } = req.body;
+    console.log(req.body)
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                fullName,
-                email
+                fullName: name,
+                email,
+                address,
+                farm: {
+                    farmName,
+                    location
+                }
             }
         },
-        { new: true }
+        { new: true }   
     ).select("-password -refreshToken");
 
     return res.status(200).json(new ApiResponse(200, user, "Account details updated successfully"));

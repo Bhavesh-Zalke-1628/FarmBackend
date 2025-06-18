@@ -159,11 +159,77 @@ const getProductByStoreId = asyncHandler(async () => {
 
 })
 
+
+const changeStockStatus = asyncHandler(async (req, res) => {
+    const { productId } = req.params;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+        throw new ApiError(404, "Product not found");
+    }
+
+    // Toggle stock status
+    const newOutOfStockStatus = !product.outOfStock;
+    product.outOfStock = newOutOfStockStatus;
+
+    // If marking as out of stock, set quantity to 0
+    if (newOutOfStockStatus) {
+        product.quantity = 0;
+    }
+
+    await product.save();
+
+    res.status(200).json(
+        new ApiResponse(200, product, "Product stock status updated successfully")
+    );
+});
+
+
+
+const updateProductQuantity = asyncHandler(async (req, res) => {
+    try {
+        console.log("hello")
+        const { productId } = req.params;
+        const { quantity } = req.body;
+
+        console.log(productId, quantity)
+
+        if (quantity === undefined || isNaN(quantity) || quantity < 0) {
+            throw new ApiError(400, "Provide a valid quntity more than 0")
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            throw new ApiError(400, "Product not found")
+        }
+
+        // Update quantity
+        product.quantity = quantity;
+        // Auto-set outOfStock based on quantity
+        product.outOfStock = quantity <= 0;
+
+        const updatedProduct = await product.save();
+
+        return res.status(200).json(
+            new ApiResponse(200, updatedProduct, "Product quantity updated successfully")
+        );
+    } catch (err) {
+        console.error("Error updating quantity:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error while updating product quantity",
+        });
+    }
+});
+
+
 export {
     getAllProduct,
     getProductById,
     createProduct,
     updateProduct,
     deleteProduct,
-    getProductByStoreId
+    getProductByStoreId,
+    changeStockStatus,
+    updateProductQuantity
 };
