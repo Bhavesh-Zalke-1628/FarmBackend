@@ -12,7 +12,6 @@ const getAllProduct = asyncHandler(async (req, res) => {
         if (!products || products.length === 0) {
             throw new ApiError(400, "No products found");
         }
-
         return res.status(200).json(new ApiResponse(200, products, "Product data"));
     } catch (error) {
         throw new ApiError(400, error.message || "Failed to get all products");
@@ -38,7 +37,6 @@ const getProductById = asyncHandler(async (req, res) => {
 // Create a new product & add to store's products array
 const createProduct = asyncHandler(async (req, res) => {
     try {
-        console.log(req.body)
         const { name, company, quantity, price, description } = req.body.productData;
         const { storeId } = req.params;
 
