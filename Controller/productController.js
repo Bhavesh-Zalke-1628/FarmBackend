@@ -58,15 +58,17 @@ const createProduct = asyncHandler(async (req, res) => {
             store: storeId
         });
 
-        // if (req.file) {
-        //     const localPath = req.file.path;
-        //     const productImg = await uploadOnCloudinary(localPath);
-        //     product.img = {
-        //         public_id: productImg.public_id,
-        //         secure_url: productImg.secure_url,
-        //     };
-        //     await product.save();
-        // }
+        console.log("req.file", req.file)
+
+        if (req.file) {
+            const localPath = req.file.path;
+            const productImg = await uploadOnCloudinary(localPath);
+            product.img = {
+                public_id: productImg.public_id,
+                secure_url: productImg.secure_url,
+            };
+            await product.save();
+        }
 
         store.products.push(product._id);
         await store.save();
@@ -151,10 +153,17 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 });
 
-const getProductByStoreId = asyncHandler(async () => {
-    const { storeId } = req.params
-    if (!storeId) {
-        throw new ApiError(4040, "Store id not mentaioned")
+const getProductByStoreId = asyncHandler(async (req, res) => {
+    console.log(req.params)
+    try {
+        const { storeId } = req.params
+        console.log(storeId)
+
+        const products = await Product.find({ store: storeId })
+        console.log(products)
+        res.status(200).json(new ApiResponse(200, products, "Product data"))
+    } catch (error) {
+        throw new ApiError(400, "Something went wronge")
     }
 
 })
@@ -223,6 +232,8 @@ const updateProductQuantity = asyncHandler(async (req, res) => {
 });
 
 
+
+
 export {
     getAllProduct,
     getProductById,
@@ -231,5 +242,5 @@ export {
     deleteProduct,
     getProductByStoreId,
     changeStockStatus,
-    updateProductQuantity
+    updateProductQuantity,
 };
