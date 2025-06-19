@@ -80,6 +80,7 @@ const createStore = asyncHandler(async (req, res, next) => {
 
 
 const updateStore = asyncHandler(async (req, res) => {
+    console.log(req.params, req.body)
     try {
         const { id } = req.params;
         const { name, email, address, contact } = req.body;

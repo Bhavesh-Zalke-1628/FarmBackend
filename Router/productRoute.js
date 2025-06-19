@@ -4,7 +4,7 @@ import { createProduct, deleteProduct, getAllProduct, getProductById, updateProd
 import upload from "../Middlerware/multerMiddle.js";
 const router = Router();
 
-router.route('/create-product/:storeId').post(isLoggedIn, upload.single('img'), createProduct);
+router.route('/create-product/:storeId').post(isLoggedIn, upload.single('productImg'), createProduct);
 router.route('/get-product/:productId').get(isLoggedIn, getProductById);
 router.route('/get-all-product').get(getAllProduct);
 router.route('/update-product/:productId').put(isLoggedIn, verifyJwt, updateProduct);

@@ -38,6 +38,10 @@ const productSchema = new Schema(
         outOfStock: {
             type: Boolean,
             default: false
+        },
+        offerPercentage: {
+            type: Number,
+            default: 0
         }
     },
     { timestamps: true }

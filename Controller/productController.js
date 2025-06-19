@@ -37,8 +37,10 @@ const getProductById = asyncHandler(async (req, res) => {
 // Create a new product & add to store's products array
 const createProduct = asyncHandler(async (req, res) => {
     try {
-        const { name, company, quantity, price, description } = req.body.productData;
+        const { name, company, quantity, price, description } = req.body.productData || req.body;
         const { storeId } = req.params;
+
+        console.log(req.body)
 
         if (!name || !company || !description || !storeId) {
             throw new ApiError(400, "Name, company, description, and storeId are required");
@@ -63,10 +65,12 @@ const createProduct = asyncHandler(async (req, res) => {
         if (req.file) {
             const localPath = req.file.path;
             const productImg = await uploadOnCloudinary(localPath);
-            product.img = {
-                public_id: productImg.public_id,
-                secure_url: productImg.secure_url,
-            };
+            if (productImg) {
+                product.img = {
+                    public_id: productImg.public_id,
+                    secure_url: productImg.secure_url,
+                };
+            }
             await product.save();
         }
 
