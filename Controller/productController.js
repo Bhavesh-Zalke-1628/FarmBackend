@@ -40,7 +40,6 @@ const createProduct = asyncHandler(async (req, res) => {
         const { name, company, quantity, price, description } = req.body.productData || req.body;
         const { storeId } = req.params;
 
-        console.log(req.body)
 
         if (!name || !company || !description || !storeId) {
             throw new ApiError(400, "Name, company, description, and storeId are required");
@@ -60,7 +59,6 @@ const createProduct = asyncHandler(async (req, res) => {
             store: storeId
         });
 
-        console.log("req.file", req.file)
 
         if (req.file) {
             const localPath = req.file.path;
@@ -158,13 +156,10 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const getProductByStoreId = asyncHandler(async (req, res) => {
-    console.log(req.params)
     try {
         const { storeId } = req.params
-        console.log(storeId)
 
         const products = await Product.find({ store: storeId })
-        console.log(products)
         res.status(200).json(new ApiResponse(200, products, "Product data"))
     } catch (error) {
         throw new ApiError(400, "Something went wronge")
@@ -201,11 +196,9 @@ const changeStockStatus = asyncHandler(async (req, res) => {
 
 const updateProductQuantity = asyncHandler(async (req, res) => {
     try {
-        console.log("hello")
         const { productId } = req.params;
         const { quantity } = req.body;
 
-        console.log(productId, quantity)
 
         if (quantity === undefined || isNaN(quantity) || quantity < 0) {
             throw new ApiError(400, "Provide a valid quntity more than 0")

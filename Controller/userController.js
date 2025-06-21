@@ -185,7 +185,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
     const { name, email, address, farmName, location } = req.body;
-    console.log(req.body)
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -200,11 +199,25 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
                 }
             }
         },
-        { new: true }   
+        { new: true }
     ).select("-password -refreshToken");
 
     return res.status(200).json(new ApiResponse(200, user, "Account details updated successfully"));
 });
+
+
+const getAllUser = asyncHandler(async (req, res) => {
+    try {
+        console.log("hello")
+
+        const users = await User.find().select("-password -refreshToken");
+        console.log(users)
+        res.status(200).json(new ApiResponse(200, users, "Users fetched successfully"));
+
+    } catch (error) {
+        return res.status(500).json(new ApiResponse(500, null, "Error fetching users"));
+    }
+})
 
 
 export {
@@ -214,5 +227,6 @@ export {
     refreshToken,
     changeCurrentPassword,
     getCurrentUser,
-    updateAccountDetails
+    updateAccountDetails,
+    getAllUser
 };

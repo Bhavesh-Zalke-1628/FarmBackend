@@ -1,19 +1,28 @@
-import { model, Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 
-const orderSchema = new Schema({
-    userId: {
+const orderDetailsSchema = Schema({
+    customer_id: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
+    order_id: {
+        type: Schema.Types.ObjectId,
+        ref: 'OrderPayment',
+        required: true
+    },
     products: [
         {
-            productId: {
+            product_id: {
                 type: Schema.Types.ObjectId,
-                ref: 'Product',
+                ref: 'products',
                 required: true
             },
             quantity: {
+                type: Number,
+                required: true
+            },
+            price: {
                 type: Number,
                 required: true
             }
@@ -21,23 +30,21 @@ const orderSchema = new Schema({
     ],
     total: {
         type: Number,
+        required: true
     },
     status: {
         type: String,
         enum: ['pending', 'shipped', 'delivered'],
         default: 'pending',
+        required: true
     },
     paymentMethod: {
         type: String,
-        enum: ['cash', 'card'],
+        enum: ['cash', 'card', 'online'],
         default: 'cash',
     },
-    paymentStatus: {
-        type: String,
-        enum: ['paid', 'unpaid'],
-        default: 'unpaid',
-    },
-}, { timestamps: true })
+});
 
-const OrderDetails = model("orderDetails", orderSchema)
+const OrderDetails = model("OrderDetails", orderDetailsSchema);
+
 export default OrderDetails;
