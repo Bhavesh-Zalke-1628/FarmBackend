@@ -3,17 +3,21 @@ import PDFDocument from "pdfkit";
 import razorpayInstance from "../utils/razorpayInstance.js";
 import OrderPayment from "../Model/orderPaymentModel.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
 
 // GET /payment/razorpay/getid
 const getRazorpayKey = (req, res) => {
-    res.status(200).json({
-        success: true,
-        data: { key: process.env.RAZORPAY_KEY_ID },
-    });
+    try {
+        res.status(200).json(new ApiResponse(200, { key: process.env.RAZORPAY_KEY_ID }, "Razorpay key"));
+    } catch (error) {
+        throw new ApiError(400, "Something went wronge")
+    }
 };
 
 // POST /payment/razorpay/order
 const createOrder = async (req, res) => {
+
+    console.log(req.body)
     try {
         const { amount } = req.body;
 
@@ -34,10 +38,10 @@ const createOrder = async (req, res) => {
                 currency: order.currency,
                 amount: order.amount,
             },
-            "order create successfully")
-        );
+            "order create successfully"
+        ));
     } catch (err) {
-        res.status(500).json({ success: false, message: "Order creation failed", error: err.message });
+        throw new ApiError(400, "Order creation failed")
     }
 };
 // POST /payment/razorpay/verify
@@ -48,7 +52,7 @@ const verifyPayment = async (req, res) => {
         const body = razorpay_order_id + "|" + razorpay_payment_id;
 
         const expectedSignature = crypto
-            .createHmac("sha256", process.env.RAZORPAY_SECRET)
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
             .update(body.toString())
             .digest("hex");
 
@@ -66,11 +70,11 @@ const verifyPayment = async (req, res) => {
             user: req.user?.id, // Add if you have auth middleware
         });
 
-        res.status(200).json({ success: true, data: paymentRecord, message: "Payment verified successfully" });
+        res.status(200).json(new ApiResponse(200, paymentRecord, "Verify successfully"))
 
     } catch (err) {
         console.log(err)
-        res.status(500).json({ success: false, message: "Payment verification failed", error: err.message });
+        throw new ApiError(400, "Payment verification failed")
     }
 };
 
