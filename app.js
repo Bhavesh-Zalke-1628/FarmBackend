@@ -29,7 +29,7 @@ app.use("/api/v1/users", authRouter)
 app.use("/api/v1/store", storeRoute)
 app.use("/api/v1/product", productRoute)
 app.use("/api/v1/payment", paymentRoute)
-app.use("/api/v1/order-payment", orderPaymentRoute)
+app.use("/api/v1/order", orderPaymentRoute)
 
 
 export { app }

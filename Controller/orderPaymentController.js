@@ -2,6 +2,7 @@ import crypto from "crypto";
 import PDFDocument from "pdfkit";
 import razorpayInstance from "../utils/razorpayInstance.js";
 import OrderPayment from "../Model/orderPaymentModel.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 // GET /payment/razorpay/getid
 const getRazorpayKey = (req, res) => {
@@ -17,24 +18,28 @@ const createOrder = async (req, res) => {
         const { amount } = req.body;
 
         const options = {
-            amount: amount * 100, // convert to paise
+            amount: amount * 100,
             currency: "INR",
             receipt: `receipt_order_${Date.now()}`,
         };
 
         const order = await razorpayInstance.orders.create(options);
 
-        res.status(201).json({
-            success: true,
-            orderId: order.id,
-            currency: order.currency,
-            amount: order.amount,
-        });
+        console.log(order)
+
+        res.status(201).json(new ApiResponse(
+            200,
+            {
+                orderId: order.id,
+                currency: order.currency,
+                amount: order.amount,
+            },
+            "order create successfully")
+        );
     } catch (err) {
         res.status(500).json({ success: false, message: "Order creation failed", error: err.message });
     }
 };
-
 // POST /payment/razorpay/verify
 const verifyPayment = async (req, res) => {
     try {
@@ -51,7 +56,7 @@ const verifyPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid signature" });
         }
 
-        const paymentRecord = await OrderPayment.cpreate({
+        const paymentRecord = await OrderPayment.create({
             orderId: razorpay_order_id,
             paymentId: razorpay_payment_id,
             signature: razorpay_signature,
@@ -62,6 +67,7 @@ const verifyPayment = async (req, res) => {
         });
 
         res.status(200).json({ success: true, data: paymentRecord, message: "Payment verified successfully" });
+
     } catch (err) {
         console.log(err)
         res.status(500).json({ success: false, message: "Payment verification failed", error: err.message });
