@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import { type } from "os";
 
 const productSchema = new Schema(
     {
@@ -42,9 +41,14 @@ const productSchema = new Schema(
         offerPercentage: {
             type: Number,
             default: 0
+        },
+        categeory: {
+            type: String,
         }
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+    }
 );
 
 const Product = model("Product", productSchema); // ✅ Model name capitalized

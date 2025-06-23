@@ -1,38 +1,60 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { config } from "dotenv";
-config();
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GOOGLE_GEMINI_KEY);
 
-const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash",
-    systemInstruction: `You are a helpful assistant providing weather forecasts and their impact on sugarcane crops.  Provide forecasts in a clear, concise format.  For each day, indicate the weather, temperature (Celsius), and a brief analysis of its potential impact on sugarcane (helpful, harmless, or harmful), along with specific suggestions for mitigating any negative effects.`,
+// Agricultural AI Model Configuration
+const agriModel = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: `You are Krishi Mitra, an AI agricultural assistant for Maharashtra farmers. Provide:
+  1. Accurate weather forecasts in Marathi/English
+  2. Crop-specific advice for sugarcane, soybean, cotton etc.
+  3. Practical farming recommendations
+  4. Market price analysis
+  5. Pest/disease warnings
+  Always respond in the user's preferred language.`,
 });
 
-async function getSugarcaneWeatherForecast(location) {
+export const getAgriculturalInsights = async (prompt, language = 'en') => {
     try {
-        const prompt = `Provide a detailed 8-day weather forecast for ${location}, focusing on conditions relevant to sugarcane growth.  Include:
-        * Daily weather description (e.g., sunny, cloudy, rainy)
-        * Daily high and low temperatures (Celsius)
-        * Wind speed and direction (if significant)
-        * Humidity (if significant)
-        * Rainfall amount (if any)
-
-        For each day, analyze the potential impact on sugarcane (helpful, harmless, or harmful) and provide specific suggestions for mitigating any negative effects (e.g., irrigation strategies, fertilizer adjustments, pest control measures).`;
-
-        const result = await model.generateContent(prompt);
+        const result = await agriModel.generateContent(prompt);
         return result.response.text();
     } catch (error) {
-        console.error("Error getting weather forecast:", error);
-        return "Error getting weather forecast.";
+        console.error("AI Service Error:", error);
+        return language === 'mr'
+            ? 'त्रुटी: कृपया पुन्हा प्रयत्न करा'
+            : 'Error: Please try again';
     }
-}
+};
 
-async function main() {
-    const location = "pune"; // Replace with the actual location
-    const forecast = await getSugarcaneWeatherForecast(location);
-}
+// Specialized functions for different agricultural needs
+export const getCropSpecificForecast = async (crop, location, language) => {
+    const prompt = `Provide 7-day ${crop}-specific weather forecast for ${location} in ${language}. Include:
+  - Daily weather conditions
+  - Temperature ranges
+  - Rainfall predictions
+  - Growth impact analysis
+  - Recommended farming actions`;
 
-main();
+    return await getAgriculturalInsights(prompt, language);
+};
 
-export default getSugarcaneWeatherForecast;
+export const getMarketAnalysis = async (crop, language) => {
+    const prompt = `Analyze current market trends for ${crop} in Maharashtra in ${language}. Include:
+  - Current prices
+  - Price trends
+  - Demand forecast
+  - Best selling strategies`;
+
+    return await getAgriculturalInsights(prompt, language);
+};
+
+export const getPestAdvisory = async (crop, region, language) => {
+    const prompt = `Provide pest/disease advisory for ${crop} in ${region} in ${language}. Include:
+  - Current risks
+  - Prevention methods
+  - Organic treatment options
+  - Chemical treatment options (if severe)`;
+
+    return await getAgriculturalInsights(prompt, language);
+};
