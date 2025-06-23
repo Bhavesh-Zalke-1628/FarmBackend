@@ -7,7 +7,7 @@ const router = Router();
 router.route('/create-product/:storeId').post(isLoggedIn, upload.single('productImg'), createProduct);
 router.route('/get-product/:productId').get(isLoggedIn, getProductById);
 router.route('/get-all-product').get(getAllProduct);
-router.route('/update-product/:productId').put(isLoggedIn, verifyJwt, updateProduct);
+router.route('/update-product/:productId').put(isLoggedIn, verifyJwt, upload.single("productImg"), updateProduct);
 router.route('/delete-product/:productId').delete(isLoggedIn, verifyJwt, deleteProduct);
 router.route('/get-store-product/:storeId').get(isLoggedIn, verifyJwt, getProductByStoreId);
 router.route('/change-stock-product/:productId').patch(isLoggedIn, changeStockStatus)

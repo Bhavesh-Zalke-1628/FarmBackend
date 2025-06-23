@@ -208,10 +208,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const getAllUser = asyncHandler(async (req, res) => {
     try {
-        console.log("hello")
 
         const users = await User.find().select("-password -refreshToken");
-        console.log(users)
         res.status(200).json(new ApiResponse(200, users, "Users fetched successfully"));
 
     } catch (error) {

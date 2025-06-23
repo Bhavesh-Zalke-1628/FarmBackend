@@ -86,10 +86,11 @@ const createProduct = asyncHandler(async (req, res) => {
 
 // Update product and store reference if storeId is changed
 const updateProduct = asyncHandler(async (req, res) => {
+
     try {
 
         const { productId } = req.params;
-        const { name, company, quantity, } = req.body;
+        const { name, company, quantity, price, offerPercentage } = req.body;
 
         const existingProduct = await Product.findById(productId);
 
@@ -97,29 +98,19 @@ const updateProduct = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Product not found");
         }
 
-        // If storeId is changed, update store reference
-        // if (storeId && storeId !== existingProduct.store?.toString()) {
-        //     const oldStore = await Store.findOne({ products: productId });
-
-        //     if (oldStore) {
-        //         oldStore.products = oldStore.products.filter(prodId => prodId.toString() !== id);
-        //         await oldStore.save();
-        //     }
-
-        //     const newStore = await Store.findById(storeId);
-        //     if (!newStore) {
-        //         throw new ApiError(400, "New store not found");
-        //     }
-        //     newStore.products.push(id);
-        //     await newStore.save();
-        // }
-
         // Update product
         const updatedProduct = await Product.findByIdAndUpdate(
             productId,
-            { name, company, quantity },
+            {
+                name,
+                company,
+                quantity,
+                price,
+                offerPercentage
+            },
             { new: true }
         );
+
 
         return res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"));
     } catch (error) {
@@ -196,6 +187,8 @@ const changeStockStatus = asyncHandler(async (req, res) => {
 
 const updateProductQuantity = asyncHandler(async (req, res) => {
     try {
+
+
         const { productId } = req.params;
         const { quantity } = req.body;
 

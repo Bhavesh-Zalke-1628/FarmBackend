@@ -15,6 +15,7 @@ app.use(express.json({ limit: "16kb" }))
 app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 app.use(express.static("public"))
 app.use(cookieParser())
+app.use(morgan('dev'))
 
 
 //routes import
@@ -24,6 +25,7 @@ import productRoute from './Router/productRoute.js'
 import paymentRoute from './Router/paymentRouter.js'
 import orderPaymentRoute from './Router/orderPaymentRouter.js'
 import OrderDetailsRoute from './Router/orderDetailsRouter.js'
+import morgan from "morgan"
 
 //routes declaration
 app.use("/api/v1/users", authRouter)

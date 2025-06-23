@@ -132,7 +132,6 @@ const downloadReceipt = async (req, res) => {
 
 // POST /payment/razorpay/cash
 const createCODPayment = async (req, res) => {
-    console.log(req.body)
     try {
         const { amount } = req.body;
 
