@@ -8,7 +8,7 @@ config()
 const app = express()
 app.use(
     cors({
-        origin: '*',
+        origin: process.env.FRONTEND_URI,
         methods: ["POST", "GET", "PUT", "PUT", "PATCH", "DELETE"],
         credentials: true,
     })
