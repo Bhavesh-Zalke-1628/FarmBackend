@@ -37,7 +37,7 @@ const getProductById = asyncHandler(async (req, res) => {
 // Create a new product & add to store's products array
 const createProduct = asyncHandler(async (req, res) => {
     try {
-        const { name, company, quantity, price, description } = req.body.productData || req.body;
+        const { name, company, quantity, price, description, offerPercentage } = req.body.productData || req.body;
         const { storeId } = req.params;
 
 
@@ -56,6 +56,7 @@ const createProduct = asyncHandler(async (req, res) => {
             quantity,
             price,
             description,
+            offerPercentage,
             store: storeId
         });
 
