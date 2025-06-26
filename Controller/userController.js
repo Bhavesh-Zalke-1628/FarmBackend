@@ -187,7 +187,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     const { name, email, address, farmName, location } = req.body;
 
     const user = await User.findByIdAndUpdate(
-        req.user?._id,
+        req.user?.id,
         {
             $set: {
                 fullName: name,

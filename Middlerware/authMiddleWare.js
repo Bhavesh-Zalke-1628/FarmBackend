@@ -9,7 +9,13 @@ const isLoggedIn = async (req, res, next) => {
     if (!accessToken) {
         return next(new ApiError("unauthenticated ,Please log in again", 400))
     }
+
+    console.log("accessToken", accessToken)
+
     const userDetails = await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+
+    console.log("userDetails", userDetails)
+
     req.user = userDetails
     next()
 }
@@ -32,7 +38,10 @@ const verifyJwt =
                     throw new ApiError(401, "Invalid access token ");
                 }
 
+                console.log("user", user)
+
                 req.user = user;
+                console.log("req.user", req.user)
                 next();
             } catch (error) {
                 throw new ApiError(401, error?.message || "Invalid access token")
