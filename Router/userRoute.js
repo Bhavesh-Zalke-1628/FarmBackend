@@ -3,8 +3,7 @@ import { Router } from "express";
 const router = Router()
 
 import { getAllUser, getCurrentUser, loginUser, logOut, refreshToken, register, updateAccountDetails } from "../Controller/userController.js";
-import { isLoggedIn, verifyJwt } from "../Middlerware/authMiddleWare.js";
-
+import { isLoggedIn, verifyJwt } from "../Middlerware/authMiddleWare.js"
 router.route('/register').post(register);
 router.route('/login-user').post(loginUser);
 

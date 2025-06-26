@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authorisedRoles, isLoggedIn, verifyJwt } from "../Middlerware/authMiddleWare.js";
+import { isLoggedIn, verifyJwt } from "../Middlerware/authMiddleWare.js"
 import { createStore, deleteStore, getAllStore, getStoreById, updateStore } from "../Controller/storeController.js";
 
 const router = Router();
