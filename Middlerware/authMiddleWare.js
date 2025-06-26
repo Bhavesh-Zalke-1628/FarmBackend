@@ -4,17 +4,59 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
+import jwt from "jsonwebtoken";
+import { ApiError } from "../utils/ApiError.js";
+import { User } from "../models/user.model.js";
+
 const isLoggedIn = async (req, res, next) => {
-    const { accessToken } = req.cookies;
+    try {
+        // 1. Check for token in multiple locations
+        const token = req.cookies?.accessToken ||
+            req.header("Authorization")?.replace("Bearer ", "") ||
+            req.body?.accessToken;
 
+        if (!token) {
+            throw new ApiError(401, "Authentication required - No token provided");
+        }
 
-    if (!accessToken) {
-        return next(new ApiError("unauthenticated ,Please log in again", 400))
+        // 2. Verify token
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+        // 3. Check if user still exists in database
+        const user = await User.findById(decoded?._id).select("-password -refreshToken");
+
+        if (!user) {
+            throw new ApiError(401, "User no longer exists");
+        }
+
+        // 4. Check if user changed password after token was issued
+        if (user.passwordChangedAfter(decoded.iat)) {
+            throw new ApiError(401, "Password changed recently - Please log in again");
+        }
+
+        // 5. Attach user to request
+        req.user = user;
+        next();
+
+    } catch (error) {
+        // Handle specific JWT errors
+        let message = "Authentication failed";
+        let statusCode = 401;
+
+        if (error.name === "JsonWebTokenError") {
+            message = "Invalid token";
+        } else if (error.name === "TokenExpiredError") {
+            message = "Token expired - Please log in again";
+        } else if (error instanceof ApiError) {
+            message = error.message;
+            statusCode = error.statusCode;
+        }
+
+        return next(new ApiError(statusCode, message));
     }
-    const userDetails = await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-    req.user = userDetails
-    next()
-}
+};
+
+export { isLoggedIn };
 
 
 const verifyJwt =
