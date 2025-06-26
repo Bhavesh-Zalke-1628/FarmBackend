@@ -16,6 +16,6 @@ router.route('/get-user').get(verifyJwt, getCurrentUser)
 
 router.route("/update-profile").put(isLoggedIn, verifyJwt, updateAccountDetails)
 
-router.route('/get-all-users').get(isLoggedIn, getAllUser)
+router.route('/get-all-users').get(getAllUser)
 
 export default router;
