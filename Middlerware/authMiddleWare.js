@@ -1,106 +1,109 @@
-
 import User from "../Model/userModel.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
+const getTokenFromRequest = (req) => {
+    // 1. Check Authorization header (mobile apps often use this)
+    if (req.header("Authorization")?.startsWith("Bearer ")) {
+        return req.header("Authorization").replace("Bearer ", "");
+    }
 
-const isLoggedIn = async (req, res, next) => {
+    // 2. Check cookies (web browsers)
+    if (req.cookies?.accessToken) {
+        return req.cookies.accessToken;
+    }
+
+    // 3. Check request body (for mobile API requests)
+    if (req.body?.accessToken) {
+        return req.body.accessToken;
+    }
+
+    // 4. Check query parameters (fallback for mobile)
+    if (req.query?.accessToken) {
+        return req.query.accessToken;
+    }
+
+    return null;
+};
+
+const verifyToken = async (token) => {
     try {
-        // 1. Check for token in multiple locations
-        const token = req.cookies?.accessToken ||
-            req.header("Authorization")?.replace("Bearer ", "") ||
-            req.body?.accessToken;
-
-        if (!token) {
-            throw new ApiError(401, "Authentication required - No token provided");
-        }
-
-        // 2. Verify token
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        // 3. Check if user still exists in database
-        const user = await User.findById(decoded?._id).select("-password -refreshToken");
+        const user = await User.findById(decoded?.id).select("-password -refreshToken");
 
         if (!user) {
-            throw new ApiError(401, "User no longer exists");
+            throw new ApiError(401, "User account not found");
         }
 
-        // 4. Check if user changed password after token was issued
-        if (user.passwordChangedAfter(decoded.iat)) {
-            throw new ApiError(401, "Password changed recently - Please log in again");
-        }
+        // Additional checks can be added here
+        // if (user.passwordChangedAfter(decoded.iat)) {
+        //     throw new ApiError(401, "Please login again - password changed");
+        // }
 
-        // 5. Attach user to request
-        req.user = user;
-        next();
-
+        return user;
     } catch (error) {
-        // Handle specific JWT errors
-        let message = "Authentication failed";
-        let statusCode = 401;
-
-        if (error.name === "JsonWebTokenError") {
-            message = "Invalid token";
-        } else if (error.name === "TokenExpiredError") {
-            message = "Token expired - Please log in again";
-        } else if (error instanceof ApiError) {
-            message = error.message;
-            statusCode = error.statusCode;
+        // Enhanced error handling for mobile clients
+        if (error.name === "TokenExpiredError") {
+            throw new ApiError(401, "Session expired - Please login again");
+        } else if (error.name === "JsonWebTokenError") {
+            throw new ApiError(401, "Invalid authentication token");
         }
-
-        return next(new ApiError(statusCode, message));
+        throw error;
     }
 };
 
+const isLoggedIn = asyncHandler(async (req, res, next) => {
+    const token = getTokenFromRequest(req);
 
-
-const verifyJwt =
-    asyncHandler(
-        async (req, res, next) => {
-            try {
-                const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
-                if (!token) {
-                    throw new ApiError(400, "Unauthenticated request")
-                }
-
-
-                const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-
-                const user = await User.findById(decodedToken.id).select("-password -refreshToken")
-
-                if (!user) {
-                    throw new ApiError(401, "Invalid access token ");
-                }
-
-                req.user = user;
-                next();
-            } catch (error) {
-                throw new ApiError(401, error?.message || "Invalid access token")
-            }
-        }
-    )
-
-
-const authorisedRoles = (...roles) => async (req, res, next) => {
-    const currentUserRoles = req.user.role;
-    if (!roles.includes(currentUserRoles)) {
-        return next(
-            new ApiError("You do not have permission to you access this route", 400)
-        )
+    if (!token) {
+        throw new ApiError(401, "Authentication required - Please login");
     }
-    next()
-}
 
-
-const authorisedSubscriber = async (req, res, next) => {
-    const user = await User.findById(req.user.id)
-    if (user.role !== 'store' && user.subscription.status !== 'active') {
-        return next(
-            new ApiError('Plase subscribe to access this cource ', 400)
-        );
-    }
+    req.user = await verifyToken(token);
     next();
-}
+});
 
-export { isLoggedIn, authorisedRoles, authorisedSubscriber, verifyJwt }
+const verifyJwt = asyncHandler(async (req, res, next) => {
+    const token = getTokenFromRequest(req);
+
+    if (!token) {
+        throw new ApiError(401, "Unauthorized access - Token missing");
+    }
+
+    req.user = await verifyToken(token);
+    next();
+});
+
+const authorisedRoles = (...roles) => asyncHandler(async (req, res, next) => {
+    if (!req.user) {
+        throw new ApiError(401, "User not authenticated");
+    }
+
+    if (!roles.includes(req.user.role)) {
+        throw new ApiError(403, `Access forbidden - Requires role: ${roles.join(", ")}`);
+    }
+
+    next();
+});
+
+const authorisedSubscriber = asyncHandler(async (req, res, next) => {
+    if (!req.user) {
+        throw new ApiError(401, "User not authenticated");
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (user.role !== 'store' && user.subscription?.status !== 'active') {
+        throw new ApiError(403, "Premium content - Please subscribe to access");
+    }
+
+    next();
+});
+
+export {
+    isLoggedIn,
+    verifyJwt,
+    authorisedRoles,
+    authorisedSubscriber
+};
