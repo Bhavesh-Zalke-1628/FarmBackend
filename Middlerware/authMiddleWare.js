@@ -53,7 +53,6 @@ const isLoggedIn = async (req, res, next) => {
     }
 };
 
-export { isLoggedIn };
 
 
 const verifyJwt =
