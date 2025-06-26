@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { isLoggedIn } from "../Middlerware/authMiddleWare.js";
 import {
     createOrderDetails,
     getAllOrderDetails,
@@ -11,7 +10,7 @@ import {
 const router = Router();
 
 // ✅ Create order details (POST)
-router.route("/create-order-details").post(isLoggedIn, createOrderDetails);
+router.route("/create-order-details").post(createOrderDetails);
 
 // ✅ Get all orders (GET)
 router.route("/all-order-details").get(getAllOrderDetails);
@@ -20,9 +19,9 @@ router.route("/all-order-details").get(getAllOrderDetails);
 router.route("/customer-orders/:customerId").get(getOrderDetailsByCustomerId);
 
 // ✅ Update order status (PUT)
-router.route("/update-order-status/:orderId").put(isLoggedIn, updateOrderStatus);
+router.route("/update-order-status/:orderId").put(updateOrderStatus);
 
 // ✅ Delete order (DELETE)
-router.route("/delete-order-details/:orderId").delete(isLoggedIn, deleteOrderDetails);
+router.route("/delete-order-details/:orderId").delete(deleteOrderDetails);
 
 export default router;

@@ -119,9 +119,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
 
 const logOut = asyncHandler(async (req, res) => {
-    const { _id } = req.user;
+    const { id } = req.user;
 
-    await User.findByIdAndUpdate(_id, { $set: { refreshToken: undefined } }, { new: true });
+    await User.findByIdAndUpdate(id, { $set: { refreshToken: undefined } }, { new: true });
 
     res
         .status(200)
