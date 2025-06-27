@@ -71,4 +71,4 @@ const authorisedSubscriber = async (req, res, next) => {
     next();
 }
 
-export { isLoggedIn, authorisedRoles, authorisedSubscriber, verifyJwt }
+export { authorisedRoles, authorisedSubscriber, verifyJwt, isLoggedIn }
