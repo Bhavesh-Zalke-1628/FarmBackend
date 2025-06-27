@@ -134,7 +134,7 @@ const downloadReceipt = async (req, res) => {
 const createCODPayment = async (req, res) => {
     try {
         const { amount } = req.body;
-
+        console.log(req.user)
 
         const paymentRecord = await OrderPayment.create({
             paymentMethod: "cash",

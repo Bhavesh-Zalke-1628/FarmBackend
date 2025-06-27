@@ -4,21 +4,24 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
-const isLoggedIn = async (req, res, next) => {
+const isLoggedIn = asyncHandler(async (req, res, next) => {
     const { accessToken } = req.cookies;
-    if (!accessToken) {
-        return next(new ApiError("unauthenticated ,Please log in again", 400))
-    }
 
     console.log("accessToken", accessToken)
 
-    const userDetails = await jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+    if (!accessToken) {
+        return next(new ApiError('Unauthenticated. Please log in again.', 401));
+    }
 
-    console.log("userDetails", userDetails)
+    try {
+        const userDetails = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
-    req.user = userDetails
-    next()
-}
+        req.user = userDetails; // Set user info for next middleware/controllers
+        next();
+    } catch (err) {
+        return next(new ApiError('Invalid or expired token. Please log in again.', 401));
+    }
+});
 
 const verifyJwt =
     asyncHandler(
