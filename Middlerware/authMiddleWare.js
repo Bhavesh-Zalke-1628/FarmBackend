@@ -5,17 +5,45 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
 const isLoggedIn = asyncHandler(async (req, res, next) => {
-    const { accessToken } = req.cookies;
-    if (!accessToken) {
-        return next(new ApiError('Unauthenticated. Please log in again.', 401));
+    // Check for token in cookies (standard web) or authorization header (common for mobile)
+    let token = req.cookies.accessToken ||
+        req.headers['authorization']?.replace('Bearer ', '') ||
+        req.body.token ||
+        req.query.token;
+
+    if (!token) {
+        return next(new ApiError('Authentication required. Please log in.', 401));
     }
 
     try {
-        const userDetails = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-        req.user = userDetails; // Set user info for next middleware/controllers
+        // Verify the token
+        const userDetails = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+        // Attach user to request object
+        req.user = userDetails;
+
+        // If token came from header/body/query, set it as a cookie for web clients
+        if (!req.cookies.accessToken && req.get('origin')) {
+            res.cookie('accessToken', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 24 * 60 * 60 * 1000 // 1 day
+            });
+        }
+
         next();
     } catch (err) {
-        return next(new ApiError('Invalid or expired token. Please log in again.', 401));
+        // Handle specific JWT errors if needed
+        let errorMessage = 'Invalid or expired token. Please log in again.';
+
+        if (err.name === 'TokenExpiredError') {
+            errorMessage = 'Session expired. Please log in again.';
+        } else if (err.name === 'JsonWebTokenError') {
+            errorMessage = 'Invalid authentication token.';
+        }
+
+        return next(new ApiError(errorMessage, 401));
     }
 });
 
