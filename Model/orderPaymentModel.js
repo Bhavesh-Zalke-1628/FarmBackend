@@ -8,8 +8,12 @@ const orderPaymentSchema = new Schema(
             required: true,
         },
         orderId: {
+            type: String,
+        },
+        razorpayOrderId: {
             type: String, // Razorpay order ID for online, optional for cash
         },
+
         paymentId: {
             type: String, // Razorpay payment ID, optional for cash
         },
@@ -29,10 +33,12 @@ const orderPaymentSchema = new Schema(
             enum: ["created", "paid", "failed", "pending"], // added "pending" for COD
             default: "created",
         },
+
         user: {
             type: Schema.Types.ObjectId,
             ref: "User",
         },
+
     },
     { timestamps: true }
 );

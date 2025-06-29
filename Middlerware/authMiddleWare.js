@@ -6,16 +6,13 @@ import jwt from 'jsonwebtoken'
 
 const isLoggedIn = asyncHandler(async (req, res, next) => {
     const { accessToken } = req.cookies;
-
-    console.log("accessToken", accessToken)
-
     if (!accessToken) {
         return next(new ApiError('Unauthenticated. Please log in again.', 401));
     }
 
     try {
         const userDetails = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-
+        console.log(userDetails)
         req.user = userDetails; // Set user info for next middleware/controllers
         next();
     } catch (err) {
