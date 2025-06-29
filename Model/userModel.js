@@ -2,6 +2,38 @@ import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
+const cartItemSchema = new Schema({
+    productId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'Product' // Reference to your Product model
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    price: {
+        type: Number,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        default: 1,
+        min: 1
+    },
+    offerPercentage: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 100
+    },
+    addedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
 const userSchema = new Schema(
     {
         fullName: {
@@ -16,17 +48,16 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: true,
-            select: false // Must explicitly select when querying
+            select: false
         },
         email: {
             type: String,
-            // unique: true, // Prevents duplicate emails
             lowercase: true,
             trim: true
         },
         role: {
             type: String,
-            enum: ['farmer', 'admin'], // Added "user" since it was defaulted before
+            enum: ['farmer', 'admin'],
             default: "farmer"
         },
         address: {
@@ -35,10 +66,9 @@ const userSchema = new Schema(
             lowercase: true
         },
         mobileNumber: {
-            type: String, // Changed to String to avoid number precision issues
-            unique: true // Ensures no duplicate numbers
+            type: String,
+            unique: true
         },
-
         farm: {
             farmName: {
                 type: String,
@@ -47,9 +77,27 @@ const userSchema = new Schema(
                 type: String
             }
         },
-        
         refreshToken: {
             type: String
+        },
+        cart: {
+            items: [cartItemSchema],
+            totalQuantity: {
+                type: Number,
+                default: 0
+            },
+            totalPrice: {
+                type: Number,
+                default: 0
+            },
+            totalDiscount: {
+                type: Number,
+                default: 0
+            },
+            updatedAt: {
+                type: Date,
+                default: Date.now
+            }
         }
     },
     { timestamps: true }
@@ -84,6 +132,39 @@ userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 
+
+userSchema.methods.calculateCartTotals = function () {
+    // Initialize all totals to 0
+    const initialTotals = {
+        quantity: 0,
+        price: 0,
+        discount: 0
+    };
+
+    // Calculate totals by reducing through cart items
+    const { quantity, price, discount } = this.cart.items.reduce(
+        (totals, item) => {
+            const itemPrice = item.price * item.quantity;
+            const itemDiscount = (item.price * (item.offerPercentage || 0) / 100) * item.quantity;
+
+            return {
+                quantity: totals.quantity + item.quantity,
+                price: totals.price + itemPrice,
+                discount: totals.discount + itemDiscount
+            };
+        },
+        initialTotals
+    );
+
+    // Update cart with calculated values
+    this.cart.totalQuantity = quantity;
+    this.cart.totalPrice = price;
+    this.cart.totalDiscount = discount;
+    this.cart.updatedAt = new Date();
+
+    // Return the updated cart (useful for chaining)
+    return this;
+};
 
 
 const User = model("User", userSchema);

@@ -1,5 +1,6 @@
 import express from "express"
 import cors from "cors"
+import morgan from "morgan"
 import cookieParser from "cookie-parser"
 
 import { config } from "dotenv"
@@ -27,7 +28,8 @@ import productRoute from './Router/productRoute.js'
 import paymentRoute from './Router/paymentRouter.js'
 import orderPaymentRoute from './Router/orderPaymentRouter.js'
 import OrderDetailsRoute from './Router/orderDetailsRouter.js'
-import morgan from "morgan"
+import cartRoute from "./Router/cartRouter.js"
+
 
 //routes declaration
 app.use("/api/v1/users", authRouter)
@@ -36,5 +38,6 @@ app.use("/api/v1/product", productRoute)
 app.use("/api/v1/payment", paymentRoute)
 app.use("/api/v1/order", orderPaymentRoute)
 app.use("/api/v1/order-details", OrderDetailsRoute)
+app.use("/api/v1/cart", cartRoute)
 
 export { app }

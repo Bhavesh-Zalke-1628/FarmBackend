@@ -12,7 +12,6 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
 
     try {
         const userDetails = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-        console.log(userDetails)
         req.user = userDetails; // Set user info for next middleware/controllers
         next();
     } catch (err) {
