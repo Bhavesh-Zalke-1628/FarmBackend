@@ -11,6 +11,7 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
         req.body.token ||
         req.query.token;
 
+
     if (!token) {
         return next(new ApiError('Authentication required. Please log in.', 401));
     }
@@ -65,11 +66,9 @@ const verifyJwt =
                     throw new ApiError(401, "Invalid access token ");
                 }
 
-                console.log("user", user)
-
                 req.user = user;
-                console.log("req.user", req.user)
                 next();
+
             } catch (error) {
                 throw new ApiError(401, error?.message || "Invalid access token")
             }

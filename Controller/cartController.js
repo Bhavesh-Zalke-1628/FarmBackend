@@ -18,31 +18,6 @@ const getUserWithCart = async (userId) => {
     }
 };
 
-// Get user's cart
-// const getCart = asyncHandler(async (req, res) => {
-//     try {
-//         console.log(req.user)
-//         const user = await getUserWithCart(req.user.id);
-
-//         console.log(user)
-
-//         return res
-//             .status(200)
-//             .json(
-//                 new ApiResponse(
-//                     200,
-//                     { cart: user.cart },
-//                     "Cart retrieved successfully"
-//                 )
-//             );
-//     } catch (error) {
-//         throw new ApiError(
-//             error.statusCode || 500,
-//             error.message || "Error getting cart",
-//             error
-//         );
-//     }
-// });
 
 
 const getCart = asyncHandler(async (req, res) => {
@@ -51,7 +26,7 @@ const getCart = asyncHandler(async (req, res) => {
             .select('cart')
             .populate({
                 path: 'cart.items.productId',
-                select: 'name company price description img offerPercentage category outOfStock quantity', // All fields needed
+                select: 'name company price description img offerPercentage category outOfStock quantity',
                 model: 'Product'
             });
 
@@ -59,15 +34,22 @@ const getCart = asyncHandler(async (req, res) => {
             throw new ApiError(404, "User not found");
         }
 
+        // Calculate netPrice (total after discounts)
+        const netPrice = user.cart.totalPrice - user.cart.totalDiscount;
+
+
+        // Shipping fee logic: ₹50 if netPrice < ₹999, else free
+        const shippingFee = netPrice < 999 ? 50 : 0;
+
+
         // Transform the populated data
         const populatedCart = {
             items: user.cart.items.map(item => {
-                // If product was deleted but still exists in cart
                 if (!item.productId) {
                     return {
                         ...item.toObject(),
-                        productId: item.productId, // This will be null
-                        isDeleted: true // Flag for frontend to handle
+                        productId: item.productId, // null if deleted
+                        isDeleted: true
                     };
                 }
 
@@ -78,14 +60,12 @@ const getCart = asyncHandler(async (req, res) => {
                     price: item.productId.price,
                     quantity: item.quantity,
                     description: item.productId.description,
-                    img: item.productId.img, // Full images object
+                    img: item.productId.img,
                     offerPercentage: item.productId.offerPercentage || 0,
                     category: item.productId.category,
                     outOfStock: item.productId.outOfStock,
                     stockQuantity: item.productId.quantity,
-                    // Include all cart-specific fields
                     addedAt: item.addedAt,
-                    // Calculated fields
                     discountedPrice: item.productId.price * (1 - (item.productId.offerPercentage || 0) / 100),
                     totalPrice: item.productId.price * item.quantity,
                     totalDiscount: (item.productId.price * (item.productId.offerPercentage || 0) / 100) * item.quantity
@@ -95,10 +75,14 @@ const getCart = asyncHandler(async (req, res) => {
                 totalQuantity: user.cart.totalQuantity,
                 totalPrice: user.cart.totalPrice,
                 totalDiscount: user.cart.totalDiscount.toFixed(2),
-                netPrice: user.cart.totalPrice - user.cart.totalDiscount,
+                netPrice: netPrice,
+                shippingFee: shippingFee,
+                grandTotal: netPrice + shippingFee,
                 updatedAt: user.cart.updatedAt
             }
         };
+
+
 
         return res
             .status(200)
@@ -122,7 +106,7 @@ const getCart = asyncHandler(async (req, res) => {
 const addToCart = asyncHandler(async (req, res) => {
     console.log(req.body)
     try {
-        const { productId, quantity = 1 } = req.body;
+        const { _id: productId, quantity = 1, } = req.body;
         console.log(productId, quantity)
 
         if (!productId) {
@@ -154,7 +138,7 @@ const addToCart = asyncHandler(async (req, res) => {
                 productId: product.id,
                 name: product.name,
                 price: product.price,
-                quantity,
+                quantity: 1,
                 offerPercentage: product.offerPercentage || 0
             });
         }

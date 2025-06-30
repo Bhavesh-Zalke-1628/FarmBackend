@@ -21,7 +21,6 @@ const getRazorpayKey = (req, res) => {
 // ✅ POST /payment/razorpay/order
 const createOrder = asyncHandler(async (req, res) => {
     const { amount } = req.body;
-    console.log(amount)
     const orderId = generateOrderId()
     const options = {
         amount: amount * 100,
@@ -43,7 +42,6 @@ const createOrder = asyncHandler(async (req, res) => {
 
 // ✅ POST /payment/razorpay/verify
 const verifyPayment = asyncHandler(async (req, res) => {
-    console.log(req.body)
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, orderId } = req.body;
 
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
@@ -132,7 +130,6 @@ const downloadReceipt = asyncHandler(async (req, res) => {
 const createCODPayment = asyncHandler(async (req, res) => {
     const { amount } = req.body;
 
-    console.log(amount)
     const orderId = generateOrderId();
 
     const paymentRecord = await OrderPayment.create({

@@ -93,7 +93,6 @@ const register = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { userName, mobileNumber, password } = req.body;
 
-    console.log(mobileNumber, password)
     const user = await User.findOne({
         mobileNumber
     }).select("+password");
@@ -111,8 +110,6 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Generate access and refresh tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
-    console.log("accessToken", accessToken)
-    console.log("refreshToken", refreshToken)
 
 
     // Exclude password and refreshToken fields before sending response

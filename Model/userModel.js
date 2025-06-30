@@ -94,6 +94,10 @@ const userSchema = new Schema(
                 type: Number,
                 default: 0
             },
+            shippingFee: {
+                type: Number,
+                default: 0
+            },
             updatedAt: {
                 type: Date,
                 default: Date.now
@@ -160,6 +164,7 @@ userSchema.methods.calculateCartTotals = function () {
     this.cart.totalQuantity = quantity;
     this.cart.totalPrice = price;
     this.cart.totalDiscount = discount;
+    // this.cart.shippingFee =
     this.cart.updatedAt = new Date();
 
     // Return the updated cart (useful for chaining)
