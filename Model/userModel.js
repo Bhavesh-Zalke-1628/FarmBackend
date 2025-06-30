@@ -102,7 +102,13 @@ const userSchema = new Schema(
                 type: Date,
                 default: Date.now
             }
-        }
+        },
+        orders: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "OrderDetails"
+            }
+        ]
     },
     { timestamps: true }
 );

@@ -3,121 +3,95 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-// ✅ 1. Create new order details
-const createOrderDetails = asyncHandler(async (req, res) => {
-    try {
 
+// Create new OrderDetails
+export const createOrderDetails = asyncHandler(async (req, res) => {
+    console.log(req.body)
+    try {
         const {
-            customer_id,
-            order_id,
+            customer,
+            orderPayment,
             products,
-            total,
-            paymentMethod,
-            status = 'pending'
+            totalAmount,
+            orderStatus,
+            deliveryAddress,
+            expectedDeliveryDate,
+            notes,
         } = req.body;
 
-        if (!customer_id || !order_id || !Array.isArray(products) || !products.length || !total || !paymentMethod) {
-            throw new ApiError(400, "All required fields must be provided");
-        }
+        // if (!customer || !orderPayment || !products?.length || !totalAmount) {
+        //     throw new ApiError(400, "All required fields must be provided");
+        // }
 
-        const orderDetails = await OrderDetails.create({
-            customer_id,
-            order_id,
+        const newOrder = await OrderDetails.create({
+            customer,
+            orderPayment,
             products,
-            total,
-            paymentMethod,
-            status,
+            totalAmount,
+            orderStatus,
+            deliveryAddress,
+            expectedDeliveryDate,
+            notes,
         });
 
-        res.status(200).json(
-            new ApiResponse(200, orderDetails, "Order details created successfully")
-        );
+        console.log("newOrder", newOrder)
+
+        res.status(201).json(new ApiResponse(201, newOrder, "Order created successfully"));
     } catch (error) {
-        throw new ApiError(400, error.message || "Failed to create order details");
+        throw new ApiError(400, "Failed to create the details")
     }
 });
 
-// ✅ 2. Get all orders
-const getAllOrderDetails = asyncHandler(async (req, res) => {
-    try {
-        const orders = await OrderDetails.find()
-            .populate("customer_id", "name email")
-            .populate("order_id", "paymentId status")
-            .populate("products.product_id", "name price");
+// Get all OrderDetails
+export const getAllOrderDetails = asyncHandler(async (req, res) => {
+    const orders = await OrderDetails.find()
+        .populate("customer")
+        .populate("orderPayment")
+        .populate("products.product");
 
-        res.status(200).json(new ApiResponse(200, orders, "Fetched all order details"));
-    } catch (error) {
-        throw new ApiError(500, error.message || "Failed to fetch order details");
-    }
+    res.status(200).json(new ApiResponse(200, orders, "Fetched all orders"));
 });
 
-// ✅ 3. Get orders by customer
-const getOrderDetailsByCustomerId = asyncHandler(async (req, res) => {
-    try {
-        const { customerId } = req.params;
+// Get single OrderDetails by ID
+export const getOrderDetailsById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-        const orders = await OrderDetails.find({ customer_id: customerId })
-            .populate("products.product_id", "name price")
-            .populate("order_id", "paymentId status");
+    const order = await OrderDetails.findById(id)
+        .populate("customer", "name email")
+        .populate("orderPayment")
+        .populate("products.product");
 
-        if (!orders.length) {
-            throw new ApiError(404, "No orders found for this customer");
-        }
-
-        res.status(200).json(new ApiResponse(200, orders, "Fetched customer's order details"));
-    } catch (error) {
-        throw new ApiError(500, error.message || "Failed to fetch customer's order details");
+    if (!order) {
+        throw new ApiError(404, "Order not found");
     }
+
+    res.status(200).json(new ApiResponse(200, order, "Order fetched successfully"));
 });
 
-// ✅ 4. Update order status
-const updateOrderStatus = asyncHandler(async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { status } = req.body;
+// Update OrderDetails
+export const updateOrderDetails = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-        const validStatus = ["pending", "shipped", "delivered"];
-        if (!validStatus.includes(status)) {
-            throw new ApiError(400, "Invalid status value");
-        }
+    const updatedOrder = await OrderDetails.findByIdAndUpdate(id, req.body, {
+        new: true,
+    });
 
-        const updatedOrder = await OrderDetails.findByIdAndUpdate(
-            orderId,
-            { status },
-            { new: true }
-        );
-
-        if (!updatedOrder) {
-            throw new ApiError(404, "Order not found");
-        }
-
-        res.status(200).json(new ApiResponse(200, updatedOrder, "Order status updated"));
-    } catch (error) {
-        throw new ApiError(500, error.message || "Failed to update order status");
+    if (!updatedOrder) {
+        throw new ApiError(404, "Order not found");
     }
+
+    res.status(200).json(new ApiResponse(200, updatedOrder, "Order updated successfully"));
 });
 
-// ✅ 5. Delete an order
-const deleteOrderDetails = asyncHandler(async (req, res) => {
-    try {
-        const { orderId } = req.params;
+// Delete OrderDetails
+export const deleteOrderDetails = asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-        const deletedOrder = await OrderDetails.findByIdAndDelete(orderId);
+    const deletedOrder = await OrderDetails.findByIdAndDelete(id);
 
-        if (!deletedOrder) {
-            throw new ApiError(404, "Order not found");
-        }
-
-        res.status(200).json(new ApiResponse(200, deletedOrder, "Order deleted successfully"));
-    } catch (error) {
-        throw new ApiError(500, error.message || "Failed to delete order");
+    if (!deletedOrder) {
+        throw new ApiError(404, "Order not found");
     }
-});
 
-export {
-    createOrderDetails,
-    updateOrderStatus,
-    deleteOrderDetails,
-    getAllOrderDetails,
-    getOrderDetailsByCustomerId
-};
+    res.status(200).json(new ApiResponse(200, deletedOrder, "Order deleted successfully"));
+});

@@ -2,8 +2,8 @@ import { Router } from "express";
 import {
     createOrderDetails,
     getAllOrderDetails,
-    getOrderDetailsByCustomerId,
-    updateOrderStatus,
+    // getOrderDetailsByCustomerId,
+    updateOrderDetails,
     deleteOrderDetails
 } from "../Controller/orderDetailsController.js";
 
@@ -13,13 +13,13 @@ const router = Router();
 router.route("/create-order-details").post(createOrderDetails);
 
 // ✅ Get all orders (GET)
-router.route("/all-order-details").get(getAllOrderDetails);
+router.route("/").get(getAllOrderDetails);
 
 // ✅ Get orders by customer (GET)F
-router.route("/customer-orders/:customerId").get(getOrderDetailsByCustomerId);
+// router.route("/customer-orders/:customerId").get(getOrderDetailsByCustomerId);
 
 // ✅ Update order status (PUT)
-router.route("/update-order-status/:orderId").put(updateOrderStatus);
+router.route("/update-order-status/:orderId").put(updateOrderDetails);
 
 // ✅ Delete order (DELETE)
 router.route("/delete-order-details/:orderId").delete(deleteOrderDetails);
