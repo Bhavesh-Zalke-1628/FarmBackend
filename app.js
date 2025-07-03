@@ -28,8 +28,9 @@ import productRoute from './Router/productRoute.js'
 import paymentRoute from './Router/paymentRouter.js'
 import orderPaymentRoute from './Router/orderPaymentRouter.js'
 import OrderDetailsRoute from './Router/orderDetailsRouter.js'
-import cartRoute from "./Router/cartRouter.js"
+import cartRoute from './Router/cartRouter.js'
 
+import adviceRouter from './Router/cropAdviceRouter.js'
 
 //routes declaration
 app.use("/api/v1/users", authRouter)
@@ -39,5 +40,8 @@ app.use("/api/v1/payment", paymentRoute)
 app.use("/api/v1/order", orderPaymentRoute)
 app.use("/api/v1/order-details", OrderDetailsRoute)
 app.use("/api/v1/cart", cartRoute)
+
+
+app.use("/api/v1/crop-advice", adviceRouter)
 
 export { app }
