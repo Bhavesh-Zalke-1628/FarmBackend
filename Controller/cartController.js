@@ -38,9 +38,9 @@ const getCart = asyncHandler(async (req, res) => {
         const netPrice = user.cart.totalPrice - user.cart.totalDiscount;
 
 
-        // Shipping fee logic: ₹50 if netPrice < ₹999, else free
-        const shippingFee = netPrice < 999 ? 50 : 0;
-
+        // shipping fee logic 
+        // if price is less than 999 the fee is 30 and less than 500 is 50 and greater than 999 is free
+        const shippingFee = netPrice < 999 ? 30 : netPrice < 500 ? 50 : 0;
 
         // Transform the populated data
         const populatedCart = {

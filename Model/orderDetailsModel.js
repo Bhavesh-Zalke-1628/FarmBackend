@@ -31,15 +31,19 @@ const orderDetailsSchema = new Schema(
                 },
             },
         ],
+
+
         totalAmount: {
             type: Number,
             // required: true,
         },
+
         orderStatus: {
             type: String,
             enum: ["pending", "shipped", "delivered"],
             default: "pending",
         },
+        
         deliveryAddress: {
             type: String,
             // required: true,

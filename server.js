@@ -1,8 +1,8 @@
 import { app } from "./app.js";
-import { config } from "dotenv";
 import connectDB from "./DbConnection/DbConnection.js";
 import Razorpay from "razorpay";
 import { v2 as cloudinary } from 'cloudinary';
+import { config } from "dotenv";
 config()
 
 

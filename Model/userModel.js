@@ -124,7 +124,7 @@ userSchema.methods.generateAccessToken = async function () {
     return jwt.sign(
         { id: this._id, role: this.role, userName: this.userName },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+        { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d" }
     );
 };
 
