@@ -69,7 +69,7 @@ const getCart = asyncHandler(async (req, res) => {
                     discountedPrice: item.productId.price * (1 - (item.productId.offerPercentage || 0) / 100),
                     totalPrice: item.productId.price * item.quantity,
                     totalDiscount: (item.productId.price * (item.productId.offerPercentage || 0) / 100) * item.quantity
-                };
+            };
             }),
             summary: {
                 totalQuantity: user.cart.totalQuantity,
