@@ -77,7 +77,7 @@ const getCart = asyncHandler(async (req, res) => {
                 totalDiscount: user.cart.totalDiscount.toFixed(2),
                 netPrice: netPrice,
                 shippingFee: shippingFee,
-                grandTotal: netPrice + shippingFee,
+                grandTotal: (netPrice + shippingFee).toFixed(2),
                 updatedAt: user.cart.updatedAt
             }
         };
