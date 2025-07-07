@@ -6,7 +6,9 @@ import User from "../Model/userModel.js";
 
 const cookieOption = {
     httpOnly: true,
-    secure: true
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none', // or 'none' if cross-site and credentials=true
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
 };
 
 
