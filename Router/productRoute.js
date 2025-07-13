@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createProduct, deleteProduct, getAllProduct, getProductById, updateProduct, getProductByStoreId, changeStockStatus, updateProductQuantity } from "../Controller/productController.js";
 import upload from "../Middlerware/multerMiddle.js";
+import { isLoggedIn } from "../Middlerware/authMiddleWare.js";
 const router = Router();
 
 router.route('/create-product/:storeId').post(upload.single('productImg'), createProduct);
@@ -15,4 +16,4 @@ router.route('/change-product-quantity/:productId').patch(updateProductQuantity)
 
 
 export default router;
-
+ 

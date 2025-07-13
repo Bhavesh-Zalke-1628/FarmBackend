@@ -5,38 +5,43 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
 const isLoggedIn = asyncHandler(async (req, res, next) => {
+    // Debug all possible token sources
+    console.log('Request details:', {
+        cookies: req.cookies,
+        headers: req.headers,
+        body: req.body,
+        query: req.query
+    });
+
     // Retrieve token from various sources
     const token =
         req.cookies?.accessToken ||
-        req.header("Authorization")?.replace("Bearer ", "") ||
-        req.body.token ||
-        req.query.token;
-
-    console.log(token)
+        req.header("Authorization")?.replace(/^Bearer\s+/i, "") || // More robust regex
+        req.body?.token ||
+        req.query?.token;
 
     if (!token) {
+        console.error('No token found in request');
         throw new ApiError(401, "Authentication required. Please log in.");
     }
 
     try {
-        // Verify the token
         const userDetails = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-        // Attach decoded user info to request
         req.user = userDetails;
 
-        // If token was from header/body/query and not already a cookie, set it
+        // Set cookie if not already set and if request is from a browser
         if (!req.cookies?.accessToken && req.get('origin')) {
             res.cookie('accessToken', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'none', // or 'none' if cross-site and credentials=true
-                maxAge: 24 * 60 * 60 * 1000 // 1 day
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                maxAge: 24 * 60 * 60 * 1000
             });
         }
 
         next();
     } catch (err) {
+        console.error('Token verification failed:', err);
         let errorMessage = "Invalid or expired token. Please log in again.";
 
         if (err.name === 'TokenExpiredError') {
@@ -48,8 +53,6 @@ const isLoggedIn = asyncHandler(async (req, res, next) => {
         throw new ApiError(401, errorMessage);
     }
 });
-
-
 const verifyJwt =
     asyncHandler(
         async (req, res, next) => {
