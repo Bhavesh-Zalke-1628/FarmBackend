@@ -104,10 +104,8 @@ const getCart = asyncHandler(async (req, res) => {
 
 // Add item to cart
 const addToCart = asyncHandler(async (req, res) => {
-    console.log(req.body)
     try {
         const { _id: productId, quantity = 1, } = req.body;
-        console.log(productId, quantity)
 
         if (!productId) {
             throw new ApiError(400, "Product ID is required");
@@ -122,8 +120,6 @@ const addToCart = asyncHandler(async (req, res) => {
         if (!product) {
             throw new ApiError(404, "Product not found");
         }
-
-        console.log("product", product)
 
         const user = await getUserWithCart(req.user.id);
 

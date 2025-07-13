@@ -8,7 +8,6 @@ export const getCropAdvice = async (req, res) => {
             crop: crop
         });
 
-        console.log(response.data)
 
         res.status(200).json(response.data); // Send AI output to frontend
     } catch (error) {
@@ -28,8 +27,6 @@ export const getFullAnalysis = async (req, res) => {
         const response = await axios.post('http://127.0.0.1:5001/api/full-analysis', {
             location: { lat, lon }
         });
-
-        console.log(response.data);
 
         res.status(200).json(response.data);
     } catch (error) {

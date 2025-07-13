@@ -21,8 +21,6 @@ const getRazorpayKey = (req, res) => {
 // ✅ POST /payment/razorpay/order
 const createOrder = asyncHandler(async (req, res) => {
 
-
-    console.log(req.body)
     const { amount } = req.body;
     const orderId = generateOrderId()
     if (!amount || isNaN(amount) || amount <= 0) {
@@ -36,11 +34,8 @@ const createOrder = asyncHandler(async (req, res) => {
         receipt: `receipt_order_${Date.now()}`,
     };
 
-    console.log("options", options);
 
     const order = await razorpayInstance.orders.create(options);
-
-    console.log("order", order);
 
     return res.status(201).json(
         new ApiResponse(201, {

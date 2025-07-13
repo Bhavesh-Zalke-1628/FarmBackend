@@ -5,13 +5,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from 'jsonwebtoken'
 
 const isLoggedIn = asyncHandler(async (req, res, next) => {
-    // Debug all possible token sources
-    console.log('Request details:', {
-        cookies: req.cookies,
-        headers: req.headers,
-        body: req.body,
-        query: req.query
-    });
 
     // Retrieve token from various sources
     const token =

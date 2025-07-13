@@ -6,7 +6,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Create new OrderDetails
 export const createOrderDetails = asyncHandler(async (req, res) => {
-    console.log(req.body)
     try {
         const {
             customer,
@@ -33,8 +32,6 @@ export const createOrderDetails = asyncHandler(async (req, res) => {
             expectedDeliveryDate,
             notes,
         });
-
-        console.log("newOrder", newOrder)
 
         res.status(201).json(new ApiResponse(201, newOrder, "Order created successfully"));
     } catch (error) {

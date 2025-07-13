@@ -27,7 +27,6 @@ const buySubscription = asyncHandler(async (req, res) => {
         total_count: 12
     });
 
-    console.log("Subscription created:", subscription);
 
     res.status(200).json(
         new ApiResponse(200, { subscription_id: subscription?.id }, "Subscription created")
