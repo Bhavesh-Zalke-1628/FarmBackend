@@ -5,18 +5,33 @@ import Product from "../Model/productModel.js";
 import Store from "../Model/storemodel.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
-// Get all products
 const getAllProduct = asyncHandler(async (req, res) => {
     try {
-        const products = await Product.find({});
-        if (!products || products.length === 0) {
-            throw new ApiError(400, "No products found");
-        }
-        return res.status(200).json(new ApiResponse(200, products, "Product data"));
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = parseInt(req.query.skip) || 0;
+
+        console.log("Pagination:", { limit, skip });
+
+        const products = await Product.find()
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
+        console.log(products.length)
+
+        const totalCount = await Product.countDocuments();
+
+        return res.status(200).json(new ApiResponse(200, {
+            products,
+            totalCount
+        }, "Product data"));
     } catch (error) {
         throw new ApiError(400, error.message || "Failed to get all products");
     }
 });
+
+
+
 
 // Get product by ID
 const getProductById = asyncHandler(async (req, res) => {
