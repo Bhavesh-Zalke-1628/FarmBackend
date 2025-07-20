@@ -6,9 +6,10 @@ import User from "../Model/userModel.js";
 
 const cookieOption = {
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
+    sameSite: 'strict', // CSRF protection
+    maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
 };
-
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
