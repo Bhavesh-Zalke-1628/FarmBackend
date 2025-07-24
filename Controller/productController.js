@@ -204,7 +204,6 @@ const changeStockStatus = asyncHandler(async (req, res) => {
 const updateProductQuantity = asyncHandler(async (req, res) => {
     try {
 
-
         const { productId } = req.params;
         const { quantity } = req.body;
 
