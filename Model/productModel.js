@@ -16,15 +16,15 @@ const productSchema = new Schema(
         },
         store: {
             type: Schema.Types.ObjectId,
-            ref: "Store", // ✅ Capitalized correctly
+            ref: "Store",
         },
         price: {
             type: Number,
-            default: 0
+            default: 0,
         },
         description: {
             type: String,
-            required: true
+            required: true,
         },
         img: {
             public_id: {
@@ -32,24 +32,50 @@ const productSchema = new Schema(
             },
             secure_url: {
                 type: String,
-            }
+            },
         },
+
+        content: {
+            activeIngredients: [
+                {
+                    name: { type: String, required: true },
+                    concentration: { type: String, required: true }, // e.g., "5%" or "50 mg/L"
+                },
+            ],
+            targetPests: {
+                type: [String], // e.g., ["Aphids", "Whiteflies"]
+                default: [],
+            },
+            usageAreas: {
+                type: [String], // e.g., ["Agriculture", "Garden"]
+                default: [],
+            },
+            instructions: {
+                type: String, // e.g., "Mix 10ml per liter of water."
+                required: true,
+            },
+            precautions: {
+                type: String, // e.g., "Avoid contact with skin and eyes."
+                required: true,
+            },
+        },
+
         outOfStock: {
             type: Boolean,
-            default: false
+            default: false,
         },
         offerPercentage: {
             type: Number,
-            default: 0
+            default: 0,
         },
         categeory: {
-            type: String,
-        }
+            type: String, // e.g., "Pesticide"
+        },
     },
     {
         timestamps: true,
     }
 );
 
-const Product = model("Product", productSchema); // ✅ Model name capitalized
+const Product = model("Product", productSchema);
 export default Product;
