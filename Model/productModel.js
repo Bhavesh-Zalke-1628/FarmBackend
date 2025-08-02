@@ -38,7 +38,10 @@ const productSchema = new Schema(
         content: {
             activeIngredients: [
                 {
-                    name: { type: String, required: true },
+                    name: {
+                        type: String,
+                        // required: true
+                    },
                     concentration: { type: String, required: true }, // e.g., "5%" or "50 mg/L"
                 },
             ],
@@ -52,11 +55,11 @@ const productSchema = new Schema(
             },
             instructions: {
                 type: String, // e.g., "Mix 10ml per liter of water."
-                required: true,
+                // required: true,
             },
             precautions: {
                 type: String, // e.g., "Avoid contact with skin and eyes."
-                required: true,
+                // required: true,
             },
         },
 

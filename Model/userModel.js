@@ -36,6 +36,14 @@ const cartItemSchema = new Schema({
 
 const userSchema = new Schema(
     {
+        profile: {
+            public_id: {
+                type: String,
+            },
+            secure_url: {
+                type: String,
+            },
+        },
         fullName: {
             type: String,
             required: [true, 'Full name is required'],

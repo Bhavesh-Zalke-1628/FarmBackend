@@ -177,8 +177,9 @@ const getProductByStoreId = asyncHandler(async (req, res) => {
 
 const changeStockStatus = asyncHandler(async (req, res) => {
     const { productId } = req.params;
-
+    console.log("productId", productId)
     const product = await Product.findById(productId);
+
     if (!product) {
         throw new ApiError(404, "Product not found");
     }
