@@ -77,7 +77,7 @@ const getCart = asyncHandler(async (req, res) => {
     );
 });
 
-// 🚩 Add to Cart
+
 const addToCart = asyncHandler(async (req, res) => {
     const { _id: productId, quantity = 1 } = req.body;
     if (!productId) throw new ApiError(400, "Product ID is required");
@@ -96,7 +96,7 @@ const addToCart = asyncHandler(async (req, res) => {
             productId: product.id,
             name: product.name,
             price: product.price,
-            quantity, // Use requested quantity
+            quantity: 1, // Use requested quantity
             offerPercentage: product.offerPercentage || 0
         });
     }
