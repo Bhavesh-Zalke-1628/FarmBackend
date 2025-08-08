@@ -7,8 +7,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const cookieOption = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
-    sameSite: 'strict', // CSRF protection
+    secure: true, // Use HTTPS only in production
     maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
 };
 
