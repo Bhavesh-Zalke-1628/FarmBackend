@@ -6,37 +6,67 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 // Create new OrderDetails
 export const createOrderDetails = asyncHandler(async (req, res) => {
-    try {
-        const {
-            customer,
-            orderPayment,
-            products,
-            totalAmount,
-            orderStatus,
-            deliveryAddress,
-            expectedDeliveryDate,
-            notes,
-        } = req.body;
+    console.log("req.body", req.body);
+    // try {
+    const {
+        orderId, // This should come from req.body
+        orderPayment,
+        products,
+        totalAmount,
+        deliveryAddress
+    } = req.body;
 
-        // if (!customer || !orderPayment || !products?.length || !totalAmount) {
-        //     throw new ApiError(400, "All required fields must be provided");
-        // }
-
-        const newOrder = await OrderDetails.create({
-            customer,
-            orderPayment,
-            products,
-            totalAmount,
-            orderStatus,
-            deliveryAddress,
-            expectedDeliveryDate,
-            notes,
-        });
-
-        res.status(201).json(new ApiResponse(201, newOrder, "Order created successfully"));
-    } catch (error) {
-        throw new ApiError(400, "Failed to create the details")
+    if (!orderId) {
+        throw new ApiError(400, "Order ID is required");
     }
+
+    // Calculate expected delivery date (5 days from now)
+    const expectedDeliveryDate = new Date();
+    expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + 5);
+
+    // Transform products array
+    const transformedProducts = products.map(product => ({
+        product: product.productId,
+        quantity: product.quantity,
+        price: product.discountedPrice
+    }));
+
+    // Convert delivery address to string
+    const addressString = `${deliveryAddress.fullName}, ${deliveryAddress.addressLine}, ${deliveryAddress.city}, ${deliveryAddress.state}, ${deliveryAddress.zip}, ${deliveryAddress.country}`;
+
+    // print the data
+    console.log("Transformed Products:", transformedProducts);
+    console.log("Address String:", addressString);
+    // Create new order details
+    console.log("Creating new order with ID:", orderId);
+    console.log("Order Payment:", orderPayment);
+    console.log("Total Amount:", totalAmount);
+    console.log("Expected Delivery Date:", expectedDeliveryDate);
+    console.log("Delivery Address:", addressString);
+    console.log("Customer ID:", req.user.id);
+    console.log("Products:", transformedProducts);
+    // Create the order details
+    console.log("Creating new order details...");
+
+
+
+    const newOrder = await OrderDetails.create({
+        order: orderId, // Make sure this is included
+        customer: req.user.id,
+        orderPayment,
+        products: transformedProducts,
+        totalAmount: totalAmount.toFixed(2),
+        orderStatus: "pending",
+        deliveryAddress: addressString,
+        expectedDeliveryDate,
+    });
+    console.log("newOrder", newOrder)
+
+    res.status(201).json(new ApiResponse(201, newOrder, "Order created successfully"));
+    // } catch (error) {
+    //     console.error("Error creating order:", error);
+    //     throw new ApiError(400, error.message || "Failed to create the order details");
+    // }
 });
 
 // Get all OrderDetails

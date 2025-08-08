@@ -6,11 +6,12 @@ import {
     updateOrderDetails,
     deleteOrderDetails
 } from "../Controller/orderDetailsController.js";
+import { isLoggedIn } from "../Middlerware/authMiddleWare.js";
 
 const router = Router();
 
 // ✅ Create order details (POST)
-router.route("/create-order-details").post(createOrderDetails);
+router.route("/create-order-details").post(isLoggedIn, createOrderDetails);
 
 // ✅ Get all orders (GET)
 router.route("/").get(getAllOrderDetails);
