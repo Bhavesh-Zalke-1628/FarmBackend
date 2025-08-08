@@ -4,13 +4,11 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken';
 import User from "../Model/userModel.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-
 const cookieOption = {
     httpOnly: true,
-    secure: true, // Use HTTPS only in production
-    maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
-};
-
+    maxAge: 7 * 24 * 60 * 1000, //for the 7 days login token
+    secure: true
+}
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
