@@ -34,6 +34,7 @@ const cartItemSchema = new Schema({
     }
 });
 
+
 const userSchema = new Schema(
     {
         profile: {
@@ -111,6 +112,17 @@ const userSchema = new Schema(
                 default: Date.now
             }
         },
+
+        crops: [
+            {
+                name: String,
+                season: String,
+                quantity: {
+                    type: Number,
+                    default: 0
+                },
+            }
+        ],
         orders: [
             {
                 type: Schema.Types.ObjectId,
