@@ -34,7 +34,6 @@ const productSchema = new Schema(
                 type: String,
             },
         },
-
         content: {
             activeIngredients: [
                 {
@@ -62,7 +61,6 @@ const productSchema = new Schema(
                 // required: true,
             },
         },
-
         outOfStock: {
             type: Boolean,
             default: false,
@@ -71,7 +69,7 @@ const productSchema = new Schema(
             type: Number,
             default: 0,
         },
-        categeory: {
+        category: {  // Fixed typo: was "categeory"
             type: String, // e.g., "Pesticide"
         },
     },
