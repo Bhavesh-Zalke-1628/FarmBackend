@@ -33,6 +33,7 @@ import OrderDetailsRoute from "./Router/orderDetailsRouter.js";
 import cartRoute from "./Router/cartRouter.js";
 import adviceRouter from "./Router/cropAdviceRouter.js";
 import cropsRouter from './Router/cropsRouter.js'
+import aiRouter from './Router/ai.route.js'
 
 
 app.use("/api/v1/users", authRouter);
@@ -44,4 +45,8 @@ app.use("/api/v1/order-details", OrderDetailsRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/crop-advice", adviceRouter);
 app.use("/api/v1/crops", cropsRouter)
+app.use("/api/v1/ai", aiRouter)
+
+
 export { app };
+
